@@ -89,7 +89,7 @@ public class ItemServiceImpl implements ItemService {
         return ItemDto.builder().name(item.getName())
                 .description(item.getDescription())
                 .available(item.getAvailable())
-                .request_id(item.getRequest() != null ? item.getRequest().getId() : null).build();
+                .requestId(item.getRequest() != null ? item.getRequest().getId() : null).build();
     }
 
 }
