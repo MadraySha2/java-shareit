@@ -77,10 +77,10 @@ public class ItemServiceImpl implements ItemService {
         return item;
     }
 
-    public ItemDto addItem(Long user_id, ItemDto itemDto) {
-        userService.getUserById(user_id);
+    public ItemDto addItem(Long userId, ItemDto itemDto) {
+        userService.getUserById(userId);
         itemDto.setId(id++);
-        itemDto.setOwner(userService.getUserById(user_id));
+        itemDto.setOwner(userService.getUserById(userId));
         itemsMap.put(itemDto.getId(), itemDto);
         return getItemById(itemDto.getId());
     }

@@ -22,14 +22,14 @@ public class UserController {
         return service.getUsers();
     }
 
-    @GetMapping("/{user_id}")
-    public User getUserById(@PathVariable Long user_id) {
-        return service.getUserById(user_id);
+    @GetMapping("/{userId}")
+    public User getUserById(@PathVariable Long userId) {
+        return service.getUserById(userId);
     }
 
-    @DeleteMapping("/{user_id}")
-    public Boolean deleteUser(@PathVariable Long user_id) {
-        return service.deleteUser(user_id);
+    @DeleteMapping("/{userId}")
+    public Boolean deleteUser(@PathVariable Long userId) {
+        return service.deleteUser(userId);
     }
 
     @PostMapping
