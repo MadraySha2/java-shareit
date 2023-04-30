@@ -21,11 +21,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User getUserById(Long user_id) {
-        if (!usersMap.containsKey(user_id)) {
+    public User getUserById(Long userId) {
+        if (!usersMap.containsKey(userId)) {
             throw new NotFoundException("User not found!");
         }
-        return usersMap.get(user_id);
+        return usersMap.get(userId);
     }
 
     @Override
@@ -41,10 +41,10 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User updateUser(Long user_id, User user) throws DuplicateException {
-        User updUser = usersMap.get(user_id);
+    public User updateUser(Long userId, User user) throws DuplicateException {
+        User updUser = usersMap.get(userId);
         for (User us : usersMap.values()) {
-            if (us.getId() != user_id && us.email.equals(user.getEmail())) {
+            if (us.getId() != userId && us.email.equals(user.getEmail())) {
                 throw new DuplicateException("Email duplicates");
             }
         }
@@ -54,17 +54,17 @@ public class UserServiceImpl implements UserService {
         if (user.getEmail() != null) {
             updUser.setEmail(user.getEmail());
         }
-        usersMap.put(user_id, updUser);
+        usersMap.put(userId, updUser);
 
-        return getUserById(user_id);
+        return getUserById(userId);
     }
 
     @Override
-    public Boolean deleteUser(Long user_id) {
-        if (!usersMap.containsKey(user_id)) {
+    public Boolean deleteUser(Long userId) {
+        if (!usersMap.containsKey(userId)) {
             return false;
         }
-        usersMap.remove(user_id);
+        usersMap.remove(userId);
         return true;
     }
 }

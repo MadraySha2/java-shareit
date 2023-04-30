@@ -7,11 +7,11 @@ import java.util.List;
 public interface UserService {
     List<User> getUsers();
 
-    User getUserById(Long user_id);
+    User getUserById(Long userId);
 
     User addUser(User user) throws DuplicateException;
 
-    User updateUser(Long user_id, User user) throws DuplicateException;
+    User updateUser(Long userId, User user) throws DuplicateException;
 
-    Boolean deleteUser(Long user_id);
+    Boolean deleteUser(Long userId);
 }
