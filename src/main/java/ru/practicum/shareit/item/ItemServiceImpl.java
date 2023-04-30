@@ -28,7 +28,7 @@ public class ItemServiceImpl implements ItemService {
     public List<ItemDto> getItems(Long id) {
         List<ItemDto> items = new ArrayList<>();
         for (ItemDto itemDto : List.copyOf(itemsMap.values())) {
-            if (itemDto.getOwner().getId() == id) {
+            if (itemDto.getOwner().getId() == id.longValue()) {
                 items.add(itemDto);
             }
         }
@@ -61,7 +61,7 @@ public class ItemServiceImpl implements ItemService {
             //                                                    тут так много if-ов, но возможно смогу еще что-то придумать
         }
         ItemDto item = itemsMap.get(itemId);
-        if (item.getOwner().getId() != id) {
+        if (item.getOwner().getId() != id.longValue()) {
             throw new NotFoundException("Another owner!");
         }
         if (itemDto.getName() != null) {
