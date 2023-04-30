@@ -44,7 +44,7 @@ public class UserServiceImpl implements UserService {
     public User updateUser(Long userId, User user) throws DuplicateException {
         User updUser = usersMap.get(userId);
         for (User us : usersMap.values()) {
-            if (us.getId() != userId && us.email.equals(user.getEmail())) {
+            if (us.getId() != userId.longValue() && us.email.equals(user.getEmail())) {
                 throw new DuplicateException("Email duplicates");
             }
         }
