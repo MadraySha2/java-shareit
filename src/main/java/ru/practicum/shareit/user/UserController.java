@@ -37,8 +37,8 @@ public class UserController {
         return service.addUser(user);
     }
 
-    @PatchMapping("/{user_id}")
-    public User updateUser(@PathVariable Long user_id, @RequestBody User user) throws DuplicateException {
-        return service.updateUser(user_id, user);
+    @PatchMapping("/{userId}")
+    public User updateUser(@PathVariable Long userId, @RequestBody User user) throws DuplicateException {
+        return service.updateUser(userId, user);
     }
 }
