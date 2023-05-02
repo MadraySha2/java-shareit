@@ -5,20 +5,26 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exceptions.NotFoundException;
-import ru.practicum.shareit.item.dto.ItemDto;
-import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.request.ItemRequest;
 import ru.practicum.shareit.user.UserService;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static ru.practicum.shareit.item.ItemMapper.toItem;
+import static ru.practicum.shareit.item.ItemMapper.toItemDto;
+import static ru.practicum.shareit.user.UserMapper.toUser;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class ItemServiceImpl implements ItemService {
 
-    private final HashMap<Long, ItemDto> itemsMap = new HashMap<>();
+    private final HashMap<Long, Item> itemsMap = new HashMap<>();
+
+    static HashMap<Long, ItemRequest> requests = new HashMap<>();
 
     @Autowired
     private final UserService userService;
@@ -26,29 +32,25 @@ public class ItemServiceImpl implements ItemService {
     private Long id = 1L;
 
     public List<ItemDto> getItems(Long id) {
-        List<ItemDto> items = new ArrayList<>();
-        for (ItemDto itemDto : List.copyOf(itemsMap.values())) {
-            if (itemDto.getOwner().getId() == id.longValue()) {
-                items.add(itemDto);
-            }
-        }
-        return items;
+        return itemsMap.values().stream()
+                .filter(item -> item.getOwner().getId().equals(id))
+                .map(ItemMapper::toItemDto).collect(Collectors.toList());
     }
 
     public ItemDto getItemById(Long itemId) {
         if (!itemsMap.containsKey(itemId)) {
             throw new NotFoundException("Item not found!");
         }
-        return itemsMap.get(itemId);
+        return toItemDto(itemsMap.get(itemId));
     }
 
     public List<ItemDto> searchItems(String text) {
         List<ItemDto> items = new ArrayList<>();
         if (!text.isBlank()) {
-            for (ItemDto itemDto : itemsMap.values()) {
-                if ((itemDto.getName().toLowerCase().contains(text.toLowerCase())
-                        || itemDto.getDescription().toLowerCase().contains(text.toLowerCase())) && itemDto.getAvailable()) {
-                    items.add(itemDto);
+            for (Item item : itemsMap.values()) {
+                if ((item.getName().toLowerCase().contains(text.toLowerCase())
+                        || item.getDescription().toLowerCase().contains(text.toLowerCase())) && item.getAvailable()) {
+                    items.add(toItemDto(item));
                 }
             }
         }
@@ -57,10 +59,9 @@ public class ItemServiceImpl implements ItemService {
 
     public ItemDto updateItem(Long id, ItemDto itemDto, Long itemId) {
         if (!itemsMap.containsKey(itemId)) {
-            throw new NotFoundException("Item not found!"); // не оч понимаю, как реализовать это по другому, поэтому
-            //                                                    тут так много if-ов, но возможно смогу еще что-то придумать
+            throw new NotFoundException("Item not found!");
         }
-        ItemDto item = itemsMap.get(itemId);
+        Item item = itemsMap.get(itemId);
         if (item.getOwner().getId() != id.longValue()) {
             throw new NotFoundException("Another owner!");
         }
@@ -74,22 +75,16 @@ public class ItemServiceImpl implements ItemService {
             item.setAvailable(itemDto.getAvailable());
         }
         itemsMap.put(itemId, item);
-        return item;
+        return toItemDto(item);
     }
 
     public ItemDto addItem(Long userId, ItemDto itemDto) {
         userService.getUserById(userId);
         itemDto.setId(id++);
-        itemDto.setOwner(userService.getUserById(userId));
-        itemsMap.put(itemDto.getId(), itemDto);
+        itemDto.setOwner(toUser(userService.getUserById(userId)));
+        itemsMap.put(itemDto.getId(), toItem(itemDto));
         return getItemById(itemDto.getId());
     }
 
-    public static ItemDto toItemDto(Item item) {
-        return ItemDto.builder().name(item.getName())
-                .description(item.getDescription())
-                .available(item.getAvailable())
-                .requestId(item.getRequest() != null ? item.getRequest().getId() : null).build();
-    }
 
 }

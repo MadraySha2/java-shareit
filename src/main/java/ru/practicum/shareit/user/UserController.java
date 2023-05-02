@@ -23,7 +23,7 @@ public class UserController {
     }
 
     @GetMapping("/{userId}")
-    public User getUserById(@PathVariable Long userId) {
+    public UserDto getUserById(@PathVariable Long userId) {
         return service.getUserById(userId);
     }
 
@@ -33,12 +33,12 @@ public class UserController {
     }
 
     @PostMapping
-    public User addUser(@Valid @RequestBody User user) throws DuplicateException {
+    public UserDto addUser(@Valid @RequestBody UserDto user) throws DuplicateException {
         return service.addUser(user);
     }
 
     @PatchMapping("/{userId}")
-    public User updateUser(@PathVariable Long userId, @RequestBody User user) throws DuplicateException {
+    public UserDto updateUser(@PathVariable Long userId, @RequestBody User user) throws DuplicateException {
         return service.updateUser(userId, user);
     }
 }

@@ -8,6 +8,9 @@ import ru.practicum.shareit.exceptions.NotFoundException;
 import java.util.HashMap;
 import java.util.List;
 
+import static ru.practicum.shareit.user.UserMapper.toUser;
+import static ru.practicum.shareit.user.UserMapper.toUserDto;
+
 @Slf4j
 @Service
 public class UserServiceImpl implements UserService {
@@ -21,35 +24,31 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User getUserById(Long userId) {
+    public UserDto getUserById(Long userId) {
         if (!usersMap.containsKey(userId)) {
             throw new NotFoundException("User not found!");
         }
-        return usersMap.get(userId);
+        return toUserDto(usersMap.get(userId));
     }
 
     @Override
-    public User addUser(User user) throws DuplicateException {
-        for (User us : usersMap.values()) {
-            if (us.email.equals(user.getEmail())) {
-                throw new DuplicateException("Email duplicates");
-            }
+    public UserDto addUser(UserDto user) throws DuplicateException {
+        if (usersMap.values().stream().anyMatch(user1 -> user1.getEmail().equals(user.getEmail()))) {
+            throw new DuplicateException("Email duplicates");
         }
         user.setId(id++);
-        usersMap.put(user.getId(), user);
+        usersMap.put(user.getId(), toUser(user));
         return user;
     }
 
     @Override
-    public User updateUser(Long userId, User user) throws DuplicateException {
+    public UserDto updateUser(Long userId, User user) throws DuplicateException {
         User updUser = usersMap.get(userId);
-        for (User us : usersMap.values()) {
-            if (us.getId() != userId.longValue() && us.email.equals(user.getEmail())) {
-                throw new DuplicateException("Email duplicates");
-            }
+        if (usersMap.values().stream().anyMatch(user1 -> user1.getEmail().equals(user.getEmail()))) {
+            throw new DuplicateException("Email duplicates");
         }
         if (user.getName() != null) {
-            updUser.setName(user.name);
+            updUser.setName(user.getName());
         }
         if (user.getEmail() != null) {
             updUser.setEmail(user.getEmail());
@@ -67,4 +66,6 @@ public class UserServiceImpl implements UserService {
         usersMap.remove(userId);
         return true;
     }
+
+
 }

@@ -2,7 +2,7 @@ package ru.practicum.shareit.booking;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.item.Item;
 import ru.practicum.shareit.user.User;
 
 import java.time.LocalDateTime;
@@ -15,15 +15,15 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 public class Booking {
 
-    Long id;
+    private Long id;
 
-    LocalDateTime start;
+    private LocalDateTime start;
 
-    LocalDateTime end;
+    private LocalDateTime end;
 
-    Item item;
+    private Item item;
 
-    User booker;
+    private User booker;
 
-
+    private Status status;
 }
