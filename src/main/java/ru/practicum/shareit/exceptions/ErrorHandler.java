@@ -22,7 +22,7 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse notAvailableException(final NotAvailableException e){
+    public ErrorResponse notAvailableException(final NotAvailableException e) {
         return new ErrorResponse("Available error", e.getMessage());
     }
 
@@ -40,7 +40,8 @@ public class ErrorHandler {
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleWrongState(final NotSupportedStateException e){
+    public ErrorResponse handleWrongState(final NotSupportedStateException e) {
         return new ErrorResponse(e.getMessage(), e.getMessage());
     }
+
 }

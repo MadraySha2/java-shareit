@@ -8,10 +8,6 @@ import javax.persistence.*;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
-/**
- * TODO Sprint add-item-requests.
- */
-
 @Data
 @RequiredArgsConstructor
 @Entity
@@ -20,7 +16,7 @@ public class ItemRequest {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long request_id;
+    private Long requestId;
 
     @Column
     private String description;
