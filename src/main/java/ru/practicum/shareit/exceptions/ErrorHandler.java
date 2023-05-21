@@ -21,6 +21,12 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse notAvailableException(final NotAvailableException e){
+        return new ErrorResponse("Available error", e.getMessage());
+    }
+
+    @ExceptionHandler
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrorResponse duplicateException(final CloneNotSupportedException e) {
         return new ErrorResponse("Duplicate error", e.getMessage());
@@ -30,5 +36,11 @@ public class ErrorHandler {
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrorResponse handleThrowable(final Throwable e) {
         return new ErrorResponse("Internal Server error", e.getMessage());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrorResponse handleWrongState(final NotSupportedStateException e){
+        return new ErrorResponse(e.getMessage(), e.getMessage());
     }
 }
