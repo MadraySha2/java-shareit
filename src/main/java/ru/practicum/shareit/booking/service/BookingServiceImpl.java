@@ -4,12 +4,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import ru.practicum.shareit.booking.model.State;
-import ru.practicum.shareit.booking.model.Status;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingEntryDto;
 import ru.practicum.shareit.booking.dto.BookingMapper;
 import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.booking.model.State;
+import ru.practicum.shareit.booking.model.Status;
 import ru.practicum.shareit.booking.repo.BookingRepository;
 import ru.practicum.shareit.exceptions.NotAvailableException;
 import ru.practicum.shareit.exceptions.NotFoundException;
@@ -37,19 +37,19 @@ public class BookingServiceImpl implements BookingService {
 
     @Transactional
     @Override
-    public BookingDto addBooking(Long id, BookingEntryDto bookingDto){
+    public BookingDto addBooking(Long id, BookingEntryDto bookingDto) {
         if (bookingDto.getStart().isEqual(bookingDto.getEnd())
-                || bookingDto.getStart().isAfter(bookingDto.getEnd())){
+                || bookingDto.getStart().isAfter(bookingDto.getEnd())) {
             throw new NotAvailableException("Incorrect date!");
         }
         Booking booking = Booking.builder().start(bookingDto.getStart()).end(bookingDto.getEnd()).build();
         Item item = itemRepository
                 .findById(bookingDto.getItemId()).orElseThrow(() -> new NotFoundException("item not found"));
-        if (id == item.getOwner().getId().longValue()){
+        if (id == item.getOwner().getId().longValue()) {
             throw new NotFoundException("YOu cant book your own item");
         }
         booking.setBooker(userRepository.findById(id).orElseThrow(() -> new NotFoundException("user not found")));
-        if (!item.getAvailable()){
+        if (!item.getAvailable()) {
             throw new NotAvailableException("Not available");
         }
         booking.setItem(item);
@@ -68,7 +68,7 @@ public class BookingServiceImpl implements BookingService {
         if (booking.getItem().getOwner().getId().longValue() != id.longValue()) {
             throw new NotFoundException("Ur not the owner!");
         }
-        if (booking.getStatus().equals(Status.APPROVED)){
+        if (booking.getStatus().equals(Status.APPROVED)) {
             throw new NotAvailableException("Already approved!");
         }
         if (approved) {
@@ -89,7 +89,7 @@ public class BookingServiceImpl implements BookingService {
         }
         Booking booking = bookingRepository.findById(bookingId).orElseThrow(() -> new NotFoundException("No such booking"));
         if (booking.getItem().getOwner().getId() != id.longValue()
-        && booking.getBooker().getId() !=id.longValue()) {
+                && booking.getBooker().getId() != id.longValue()) {
             throw new NotFoundException("Ur not the owner or booker!");
         }
         return toBookingDto(booking);
@@ -97,7 +97,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public List<BookingDto> getAllBookingByState(Long id, String state, Integer type) throws Throwable {
-        if (!userRepository.existsById(id)){
+        if (!userRepository.existsById(id)) {
             throw new NotFoundException("User not found!");
         }
         List<Booking> bookingList = new ArrayList<>();
@@ -105,7 +105,7 @@ public class BookingServiceImpl implements BookingService {
         LocalDateTime now = LocalDateTime.now();
         if (type == 1) {
             switch (convert(state)) {
-                case State.ALL:
+                case ALL:
                     bookingList = bookingRepository.findAllByBookerId(id, sort);
                     break;
                 case CURRENT:
