@@ -9,17 +9,17 @@ import java.util.List;
 
 public interface BookingRepository extends JpaRepository<Booking, Long> {
 
-    List<Booking> findAllByBookerId(Long booker_id, Sort sort);
+    List<Booking> findAllByBookerId(Long bookerId, Sort sort);
 
-    List<Booking> findAllByBookerIdAndStatus(Long booker_id, Status status, Sort sort);
+    List<Booking> findAllByBookerIdAndStatus(Long bookerId, Status status, Sort sort);
 
-    List<Booking> findAllByBookerIdAndEndBefore(Long booker_id, LocalDateTime dateTime, Sort sort);
+    List<Booking> findAllByBookerIdAndEndBefore(Long bookerId, LocalDateTime dateTime, Sort sort);
 
-    List<Booking> findAllByBookerIdAndStartAfter(Long booker_id, LocalDateTime dateTime, Sort sort);
+    List<Booking> findAllByBookerIdAndStartAfter(Long bookerId, LocalDateTime dateTime, Sort sort);
 
-    List<Booking> findAllByBookerIdAndStartBeforeAndEndAfter(Long booker_id, LocalDateTime dateTime, LocalDateTime dateTime1, Sort sort);
+    List<Booking> findAllByBookerIdAndStartBeforeAndEndAfter(Long bookerId, LocalDateTime dateTime, LocalDateTime dateTime1, Sort sort);
 
-    List<Booking> findByItemId(Long item_id, Sort sort);
+    List<Booking> findByItemId(Long itemId, Sort sort);
 
     Boolean existsByBookerIdAndEndBeforeAndStatus(Long bookerId, LocalDateTime localDateTime, Status status);
 

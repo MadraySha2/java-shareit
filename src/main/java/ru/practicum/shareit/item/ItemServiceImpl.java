@@ -6,8 +6,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.BookingItemDto;
 import ru.practicum.shareit.booking.BookingMapper;
-import ru.practicum.shareit.booking.Status;
 import ru.practicum.shareit.booking.BookingRepository;
+import ru.practicum.shareit.booking.Status;
 import ru.practicum.shareit.exceptions.NotAvailableException;
 import ru.practicum.shareit.exceptions.NotFoundException;
 import ru.practicum.shareit.item.comment.Comment;
@@ -23,9 +23,9 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static ru.practicum.shareit.item.comment.CommentMapper.toCommentDto;
 import static ru.practicum.shareit.item.ItemMapper.toItem;
 import static ru.practicum.shareit.item.ItemMapper.toItemDto;
+import static ru.practicum.shareit.item.comment.CommentMapper.toCommentDto;
 import static ru.practicum.shareit.user.UserMapper.toUser;
 
 @Slf4j
@@ -43,7 +43,7 @@ public class ItemServiceImpl implements ItemService {
 
 
     public List<ItemDto> getItems(Long id) {
-        List<ItemDto>dtoList = itemRepository.findAllByOwnerId(id).stream()
+        List<ItemDto> dtoList = itemRepository.findAllByOwnerId(id).stream()
                 .map(ItemMapper::toItemDto).collect(Collectors.toList());
         dtoList.forEach(itemDto -> itemDto.setComments(getComments(itemDto.getId())));
         dtoList.forEach(itemDto -> setBookings(itemDto, id));
@@ -103,7 +103,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     public ItemDto setBookings(ItemDto itemDto, Long userId) {
-        if (itemDto.getOwner().getId().longValue() == userId.longValue()){
+        if (itemDto.getOwner().getId().longValue() == userId.longValue()) {
             itemDto.setLastBooking(bookingRepository
                     .findByItemId(itemDto.getId(), Sort.by(Sort.Direction.DESC, "start"))
                     .stream()
@@ -123,7 +123,7 @@ public class ItemServiceImpl implements ItemService {
         return itemDto;
     }
 
-    public List<CommentDto> getComments(Long itemId){
+    public List<CommentDto> getComments(Long itemId) {
         return commentRepository
                 .findByItemId(itemId).stream().map(CommentMapper::toCommentDto).collect(Collectors.toList());
     }
