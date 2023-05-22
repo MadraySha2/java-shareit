@@ -2,7 +2,7 @@ package ru.practicum.shareit.request;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.user.User;
 
 import javax.persistence.*;
 import java.sql.Timestamp;

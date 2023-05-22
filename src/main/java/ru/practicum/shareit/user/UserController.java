@@ -3,9 +3,6 @@ package ru.practicum.shareit.user;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.exceptions.DuplicateException;
-import ru.practicum.shareit.user.dto.UserDto;
-import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.user.service.UserService;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -38,7 +35,7 @@ public class UserController {
     }
 
     @PatchMapping("/{userId}")
-    public UserDto updateUser(@PathVariable Long userId, @RequestBody User user) throws DuplicateException {
+    public UserDto updateUser(@PathVariable Long userId, @RequestBody UserDto user) throws DuplicateException {
         return service.updateUser(userId, user);
     }
 }
