@@ -51,18 +51,17 @@ public class ItemServiceImpl implements ItemService {
 
 
     public List<ItemDto> getItems(Long id, Pageable pageable) {
-        if(!userRepository.existsById(id)){
+        if (!userRepository.existsById(id)) {
             throw new NotFoundException("User Not found");
         }
-        List<ItemDto> dtoList = itemRepository.findAllByOwnerId(id).stream()
-                .map(ItemMapper::toItemDto).collect(Collectors.toList());
+        List<ItemDto> dtoList = itemRepository.findAllByOwnerId(id).stream().map(ItemMapper::toItemDto).collect(Collectors.toList());
         dtoList.forEach(itemDto -> itemDto.setComments(getComments(itemDto.getId())));
         dtoList.forEach(itemDto -> setBookings(itemDto, id));
         return dtoList;
     }
 
     public ItemDto getItemById(Long userId, Long itemId) {
-        if(!userRepository.existsById(userId)){
+        if (!userRepository.existsById(userId)) {
             throw new NotFoundException("User Not found");
         }
         ItemDto item = toItemDto(itemRepository.findById(itemId).orElseThrow(() -> new NotFoundException("Item not found")));
@@ -75,8 +74,7 @@ public class ItemServiceImpl implements ItemService {
         if (text.isBlank()) {
             return new ArrayList<>();
         }
-        return itemRepository.findByNameOrDescriptionAvailable(text, pageable)
-                .stream().map(ItemMapper::toItemDto).collect(Collectors.toList());
+        return itemRepository.findByNameOrDescriptionAvailable(text, pageable).stream().map(ItemMapper::toItemDto).collect(Collectors.toList());
     }
 
     public ItemDto updateItem(Long id, ItemDto itemDto, Long itemId) {
@@ -101,9 +99,7 @@ public class ItemServiceImpl implements ItemService {
         itemDto.setOwner(toUser(userService.getUserById(userId)));
         Item item = toItem(itemDto);
         if (itemDto.getRequestId() != null) {
-            ItemRequest itemRequest = requestsRepository
-                    .findById(itemDto.getRequestId())
-                    .orElseThrow(() -> new NotFoundException("Request not found!"));
+            ItemRequest itemRequest = requestsRepository.findById(itemDto.getRequestId()).orElseThrow(() -> new NotFoundException("Request not found!"));
             item.setRequest(itemRequest);
         }
         return toItemDto(itemRepository.save(item));
@@ -113,8 +109,7 @@ public class ItemServiceImpl implements ItemService {
     public CommentDto addComment(Long userId, Long itemId, CommentDto commentDto) {
         Comment comment = Comment.builder().text(commentDto.getText()).build();
         comment.setAuthor(toUser(userService.getUserById(userId)));
-        comment.setItem((itemRepository.findById(itemId)
-                .orElseThrow(() -> new NotFoundException("No such item"))));
+        comment.setItem((itemRepository.findById(itemId).orElseThrow(() -> new NotFoundException("No such item"))));
         if (!bookingRepository.existsByBookerIdAndEndBeforeAndStatus(userId, LocalDateTime.now(), Status.APPROVED)) {
             throw new NotAvailableException("You cant comment before use!");
         }
@@ -125,28 +120,15 @@ public class ItemServiceImpl implements ItemService {
 
     public ItemDto setBookings(ItemDto itemDto, Long userId) {
         if (itemDto.getOwner().getId().longValue() == userId.longValue()) {
-            itemDto.setLastBooking(bookingRepository
-                    .findByItemId(itemDto.getId(), Sort.by(Sort.Direction.DESC, "start"))
-                    .stream()
-                    .filter(booking -> booking.getStart().isBefore(LocalDateTime.now()))
-                    .map(BookingMapper::toItemBookingDto)
-                    .max(Comparator.comparing(BookingItemDto::getEnd))
-                    .orElse(null));
-            itemDto.setNextBooking(bookingRepository
-                    .findByItemId(itemDto.getId(), Sort.by(Sort.Direction.ASC, "start"))
-                    .stream()
-                    .filter(booking -> !booking.getStatus().equals(Status.REJECTED))
-                    .map(BookingMapper::toItemBookingDto)
-                    .filter(booking -> booking.getStart().isAfter(LocalDateTime.now()))
-                    .findFirst().orElse(null));
+            itemDto.setLastBooking(bookingRepository.findByItemId(itemDto.getId(), Sort.by(Sort.Direction.DESC, "start")).stream().filter(booking -> booking.getStart().isBefore(LocalDateTime.now())).map(BookingMapper::toItemBookingDto).max(Comparator.comparing(BookingItemDto::getEnd)).orElse(null));
+            itemDto.setNextBooking(bookingRepository.findByItemId(itemDto.getId(), Sort.by(Sort.Direction.ASC, "start")).stream().filter(booking -> !booking.getStatus().equals(Status.REJECTED)).map(BookingMapper::toItemBookingDto).filter(booking -> booking.getStart().isAfter(LocalDateTime.now())).findFirst().orElse(null));
             return itemDto;
         }
         return itemDto;
     }
 
     public List<CommentDto> getComments(Long itemId) {
-        return commentRepository
-                .findByItemId(itemId).stream().map(CommentMapper::toCommentDto).collect(Collectors.toList());
+        return commentRepository.findByItemId(itemId).stream().map(CommentMapper::toCommentDto).collect(Collectors.toList());
     }
 
 }
