@@ -147,6 +147,16 @@ class ItemServiceImplTest {
     }
 
     @Test
+    void getItemById_invalidUser() {
+        assertThrows(NotFoundException.class, () -> itemService.getItemById(99L, 1L));
+    }
+
+    @Test
+    void getItemById_invalidItem() {
+        assertThrows(NotFoundException.class, () -> itemService.getItemById(2L, 99L));
+    }
+
+    @Test
     void updateItem() {
         ItemDto itemDto = ItemDto.builder().id(999L).owner(user)
                 .name("Updated").description("Updated").owner(user2).available(false).build();
@@ -156,6 +166,13 @@ class ItemServiceImplTest {
         assertEquals("Updated", testItem.getName());
         assertEquals("Updated", testItem.getDescription());
         assertEquals(1L, testItem.getOwner().getId());
+        assertThrows(NotFoundException.class, () -> itemService.updateItem(2L, itemDto, 1L));
+    }
+
+    @Test
+    void updateItem_invalidUser() {
+        ItemDto itemDto = ItemDto.builder().id(999L).owner(user)
+                .name("Updated").description("Updated").owner(user2).available(false).build();
         assertThrows(NotFoundException.class, () -> itemService.updateItem(2L, itemDto, 1L));
     }
 
@@ -175,10 +192,24 @@ class ItemServiceImplTest {
     }
 
     @Test
+    void addItem_invalidUser() {
+        ItemDto testItem = ItemDto.builder().owner(user)
+                .name("Updated").description("Updated").available(true).build();
+        assertThrows(NotFoundException.class, () -> itemService.addItem(99L, testItem));
+    }
+
+    @Test
     void addComment() {
         ItemDto itemDto = itemService.getItems(2L, pageRequest).get(0);
         assertEquals(1, itemDto.getComments().size());
+        assertThrows(NotFoundException.class, () -> itemService.addComment(1L, 99L, toCommentDto(comment1)));
+    }
+    @Test
+    void addComment_invalidUser() {
         assertThrows(NotFoundException.class, () -> itemService.addComment(99L, 2L, toCommentDto(comment1)));
+    }
+    @Test
+    void addComment_invalidItem(){
         assertThrows(NotFoundException.class, () -> itemService.addComment(1L, 99L, toCommentDto(comment1)));
     }
 }

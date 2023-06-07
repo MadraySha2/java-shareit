@@ -9,6 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.test.annotation.DirtiesContext;
+import ru.practicum.shareit.exceptions.NotFoundException;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserServiceImpl;
 
@@ -66,6 +67,14 @@ class ItemRequestServiceImplTest {
     }
 
     @Test
+    void addRequest_invalidUser() {
+        assertThrows(NotFoundException.class, () -> {
+            ItemRequestDto itemRequestDto = toRequestDto(itemRequest);
+            itemRequestService.addRequest(100L, itemRequestDto);
+        });
+    }
+
+    @Test
     void getOwnRequests() {
         ItemRequestDto testItem = itemRequestService.addRequest(1L, toRequestDto(itemRequest));
         ItemRequestDto testItem2 = itemRequestService.addRequest(2L, toRequestDto(itemRequest1));
@@ -75,6 +84,13 @@ class ItemRequestServiceImplTest {
         assertEquals(1, testOwnRequests1.size());
         assertEquals("test", testOwnRequests.get(0).getDescription());
         assertEquals("test1", testOwnRequests1.get(0).getDescription());
+    }
+
+    @Test
+    void getOwnRequests_invalidUser() {
+        assertThrows(NotFoundException.class, () -> {
+            itemRequestService.getOwnRequests(100L, pageRequest);
+        });
     }
 
     @Test
@@ -95,6 +111,13 @@ class ItemRequestServiceImplTest {
     }
 
     @Test
+    void getAll_invalidUser() {
+        assertThrows(NotFoundException.class, () -> {
+            itemRequestService.getAll(100L, pageRequest);
+        });
+    }
+
+    @Test
     void getRequestById() {
         ItemRequestDto testItem = itemRequestService.addRequest(1L, toRequestDto(itemRequest));
         ItemRequestDto testItem2 = itemRequestService.addRequest(2L, toRequestDto(itemRequest1));
@@ -108,5 +131,19 @@ class ItemRequestServiceImplTest {
         assertEquals("test1", itemRequestService.getRequestById(1L, secondId).getDescription());
         assertEquals("test", itemRequestService.getRequestById(3L, firstId).getDescription());
         assertEquals("test1", itemRequestService.getRequestById(3L, secondId).getDescription());
+    }
+
+    @Test
+    void getRequestById_invalidUser() {
+        assertThrows(NotFoundException.class, () -> {
+            itemRequestService.getRequestById(100L, 1L);
+        });
+    }
+
+    @Test
+    void getRequestById_invalidRequest() {
+        assertThrows(NotFoundException.class, () -> {
+            itemRequestService.getRequestById(user.getId(), 100L);
+        });
     }
 }
