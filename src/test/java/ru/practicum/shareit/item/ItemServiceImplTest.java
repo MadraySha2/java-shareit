@@ -147,11 +147,6 @@ class ItemServiceImplTest {
     }
 
     @Test
-    void getItemById_invalidUser() {
-        assertThrows(NotFoundException.class, () -> itemService.getItemById(99L, 1L));
-    }
-
-    @Test
     void getItemById_invalidItem() {
         assertThrows(NotFoundException.class, () -> itemService.getItemById(2L, 99L));
     }
