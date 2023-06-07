@@ -69,13 +69,10 @@ public class ItemRepositoryIntegrationTest {
 
     @Test
     public void testFindAllByRequestId() {
-        Long requestId = 1L;
         ItemRequest itemRequest = ItemRequest.builder().build();
         entityManager.persist(itemRequest);
         ItemRequest itemRequest1 = ItemRequest.builder().build();
         entityManager.persist(itemRequest1);
-        itemRequest.setId(1L);
-        itemRequest1.setId(2L);
         Item item1 = Item.builder().request(itemRequest).build();
         entityManager.persist(item1);
         Item item2 = Item.builder().request(itemRequest).build();
@@ -84,7 +81,7 @@ public class ItemRepositoryIntegrationTest {
         entityManager.persist(item3);
 
         entityManager.flush();
-        List<Item> items = itemRepository.findAllByRequestId(requestId);
+        List<Item> items = itemRepository.findAllByRequestId(itemRequest.getId());
         assertThat(items).hasSize(2);
         assertThat(items).contains(item1, item2);
     }
