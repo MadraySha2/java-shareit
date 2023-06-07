@@ -10,8 +10,8 @@ import org.springframework.data.domain.Pageable;
 import ru.practicum.shareit.request.ItemRequest;
 import ru.practicum.shareit.user.User;
 
-import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -37,10 +37,17 @@ public class ItemRepositoryIntegrationTest {
         Item item3 = Item.builder().owner(user1).build();
         entityManager.persist(item3);
         entityManager.flush();
-        Collection<Item> items = itemRepository.findAllByOwnerId(user.getId());
+        List<Item> items = itemRepository.findAllByOwnerId(user.getId()).stream().collect(Collectors.toList());
 
         assertThat(items).hasSize(2);
         assertThat(items).contains(item1, item2);
+        assertThat(items.get(0).getId()).isEqualTo(item1.getId());
+        assertThat(items.get(0).getName()).isEqualTo(item1.getName());
+        assertThat(items.get(0).getDescription()).isEqualTo(item1.getDescription());
+        assertThat(items.get(1).getId()).isEqualTo(item2.getId());
+        assertThat(items.get(1).getName()).isEqualTo(item2.getName());
+        assertThat(items.get(1).getDescription()).isEqualTo(item2.getDescription());
+        ;
     }
 
     @Test
@@ -65,6 +72,12 @@ public class ItemRepositoryIntegrationTest {
 
         assertThat(items).hasSize(2);
         assertThat(items).contains(item1, item2);
+        assertThat(items.get(0).getId()).isEqualTo(item1.getId());
+        assertThat(items.get(0).getName()).isEqualTo(item1.getName());
+        assertThat(items.get(0).getDescription()).isEqualTo(item1.getDescription());
+        assertThat(items.get(1).getId()).isEqualTo(item2.getId());
+        assertThat(items.get(1).getName()).isEqualTo(item2.getName());
+        assertThat(items.get(1).getDescription()).isEqualTo(item2.getDescription());
     }
 
     @Test
@@ -84,6 +97,12 @@ public class ItemRepositoryIntegrationTest {
         List<Item> items = itemRepository.findAllByRequestId(itemRequest.getId());
         assertThat(items).hasSize(2);
         assertThat(items).contains(item1, item2);
+        assertThat(items.get(0).getId()).isEqualTo(item1.getId());
+        assertThat(items.get(0).getName()).isEqualTo(item1.getName());
+        assertThat(items.get(0).getDescription()).isEqualTo(item1.getDescription());
+        assertThat(items.get(1).getId()).isEqualTo(item2.getId());
+        assertThat(items.get(1).getName()).isEqualTo(item2.getName());
+        assertThat(items.get(1).getDescription()).isEqualTo(item2.getDescription());
     }
 
 }
