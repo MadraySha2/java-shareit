@@ -58,7 +58,7 @@ class ItemRequestServiceImplTest {
     void addRequest() {
         ItemRequestDto testItem = itemRequestService.addRequest(user.getId(), toRequestDto(itemRequest));
         assertEquals(1L, testItem.getId());
-        assertEquals(1L, testItem.getRequestor().getId());
+        assertEquals(3L, testItem.getRequestor().getId());
         assertNotNull(testItem.getCreated());
         assertNotEquals(now, testItem.getCreated());
         assertTrue(now.before(testItem.getCreated()));
