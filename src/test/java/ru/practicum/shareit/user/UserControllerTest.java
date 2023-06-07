@@ -31,7 +31,9 @@ class UserControllerTest {
     void getUsers() throws Exception {
         Mockito.when(userService.getUsers()).thenReturn(Collections.emptyList());
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/users")).andExpect(status().isOk()).andExpect(MockMvcResultMatchers.jsonPath("$.length()").value(0));
+        mockMvc.perform(MockMvcRequestBuilders.get("/users"))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.length()").value(0));
     }
 
     @Test
@@ -39,23 +41,37 @@ class UserControllerTest {
         Long invalidId = 100L;
         Mockito.when(userService.getUserById(invalidId)).thenThrow(NotFoundException.class);
 
-        mockMvc.perform(MockMvcRequestBuilders.get("/users/" + invalidId)).andExpect(status().isNotFound());
+        mockMvc.perform(MockMvcRequestBuilders.get("/users/" + invalidId))
+                .andExpect(status().isNotFound());
     }
 
     @Test
     void addUser() throws Exception {
-        UserDto userDto = UserDto.builder().name("test").email("test@test.com").build();
+        UserDto userDto = UserDto.builder()
+                .name("test")
+                .email("test@test.com")
+                .build();
 
-        mockMvc.perform(MockMvcRequestBuilders.post("/users").content(asJsonString(userDto)).contentType(MediaType.APPLICATION_JSON)).andExpect(status().isOk());
+        mockMvc.perform(MockMvcRequestBuilders.post("/users")
+                        .content(asJsonString(userDto))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
     }
 
 
     @Test
     void updateUser_invalidId() throws Exception {
         Long invalidId = 100L;
-        UserDto userDto = UserDto.builder().name("test").email("test@test.com").build();
-        Mockito.when(userService.updateUser(Mockito.eq(invalidId), Mockito.any(UserDto.class))).thenThrow(NotFoundException.class);
+        UserDto userDto = UserDto.builder()
+                .name("test")
+                .email("test@test.com")
+                .build();
+        Mockito.when(userService.updateUser(Mockito.eq(invalidId), Mockito.any(UserDto.class)))
+                .thenThrow(NotFoundException.class);
 
-        mockMvc.perform(MockMvcRequestBuilders.patch("/users/" + invalidId).content(asJsonString(userDto)).contentType(MediaType.APPLICATION_JSON)).andExpect(status().isNotFound());
+        mockMvc.perform(MockMvcRequestBuilders.patch("/users/" + invalidId)
+                        .content(asJsonString(userDto))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
     }
 }

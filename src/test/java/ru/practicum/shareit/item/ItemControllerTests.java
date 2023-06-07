@@ -51,6 +51,32 @@ public class ItemControllerTests {
     }
 
     @Test
+    public void testGetItems_InvalidFrom() throws Exception {
+        Long userId = 1L;
+        int from = -1;
+        int size = 10;
+        List<ItemDto> expectedResult = new ArrayList<>();
+        mockMvc.perform(get("/items")
+                        .header("X-Sharer-User-Id", userId)
+                        .param("from", String.valueOf(from))
+                        .param("size", String.valueOf(size)))
+                .andExpect(status().isInternalServerError());
+    }
+
+    @Test
+    public void testGetItems_InvalidSize() throws Exception {
+        Long userId = 1L;
+        int from = 0;
+        int size = -1;
+        List<ItemDto> expectedResult = new ArrayList<>();
+        mockMvc.perform(get("/items")
+                        .header("X-Sharer-User-Id", userId)
+                        .param("from", String.valueOf(from))
+                        .param("size", String.valueOf(size)))
+                .andExpect(status().isInternalServerError());
+    }
+
+    @Test
     public void testSearchItems() throws Exception {
         String text = "search";
         int from = 0;
@@ -64,6 +90,32 @@ public class ItemControllerTests {
                         .param("size", String.valueOf(size)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(expectedResult.size())));
+    }
+
+    @Test
+    public void testSearchItems_InvalidPageFrom() throws Exception {
+        String text = "search";
+        int from = -1;
+        int size = 10;
+        List<ItemDto> expectedResult = new ArrayList<>();
+        mockMvc.perform(get("/items/search")
+                        .param("text", text)
+                        .param("from", String.valueOf(from))
+                        .param("size", String.valueOf(size)))
+                .andExpect(status().isInternalServerError());
+    }
+
+    @Test
+    public void testSearchItems_InvalidPageSize() throws Exception {
+        String text = "search";
+        int from = 0;
+        int size = -1;
+        List<ItemDto> expectedResult = new ArrayList<>();
+        mockMvc.perform(get("/items/search")
+                        .param("text", text)
+                        .param("from", String.valueOf(from))
+                        .param("size", String.valueOf(size)))
+                .andExpect(status().isInternalServerError());
     }
 
     @Test

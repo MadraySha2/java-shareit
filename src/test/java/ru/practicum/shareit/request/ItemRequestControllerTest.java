@@ -97,6 +97,28 @@ public class ItemRequestControllerTest {
         mockMvc.perform(get("/requests").header("X-Sharer-User-Id", 0L).param("from", String.valueOf(from)).param("size", String.valueOf(size))).andExpect(status().isNotFound());
     }
 
+    @Test
+    public void testGetOwnRequests_InvalidPageFrom() throws Exception {
+        int from = -1;
+        int size = 10;
+        mockMvc.perform(get("/requests")
+                        .header("X-Sharer-User-Id", 0L)
+                        .param("from", String.valueOf(from))
+                        .param("size", String.valueOf(size)))
+                .andExpect(status().isInternalServerError());
+    }
+
+    @Test
+    public void testGetOwnRequests_InvalidPageSize() throws Exception {
+        int from = 0;
+        int size = -1;
+        mockMvc.perform(get("/requests")
+                        .header("X-Sharer-User-Id", 0L)
+                        .param("from", String.valueOf(from))
+                        .param("size", String.valueOf(size)))
+                .andExpect(status().isInternalServerError());
+    }
+
 
     @Test
     public void testGetAllRequests() throws Exception {
@@ -117,6 +139,32 @@ public class ItemRequestControllerTest {
         when(requestService.getAll(eq(userId), any())).thenReturn(allRequests);
 
         mockMvc.perform(get("/requests/all").header("X-Sharer-User-Id", userId).param("from", String.valueOf(from)).param("size", String.valueOf(size))).andExpect(status().isOk()).andExpect(jsonPath("$[0].id").value(request1.getId())).andExpect(jsonPath("$[0].description").value(request1.getDescription())).andExpect(jsonPath("$[1].id").value(request2.getId())).andExpect(jsonPath("$[1].description").value(request2.getDescription()));
+    }
+
+    @Test
+    public void testGetAllRequests_InvalidPageFrom() throws Exception {
+        Long userId = 1L;
+        int from = -1;
+        int size = 10;
+
+        mockMvc.perform(get("/requests/all")
+                        .header("X-Sharer-User-Id", userId)
+                        .param("from", String.valueOf(from))
+                        .param("size", String.valueOf(size)))
+                .andExpect(status().isInternalServerError());
+    }
+
+    @Test
+    public void testGetAllRequests_InvalidPageSize() throws Exception {
+        Long userId = 1L;
+        int from = 0;
+        int size = -1;
+
+        mockMvc.perform(get("/requests/all")
+                        .header("X-Sharer-User-Id", userId)
+                        .param("from", String.valueOf(from))
+                        .param("size", String.valueOf(size)))
+                .andExpect(status().isInternalServerError());
     }
 
     @Test

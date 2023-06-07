@@ -196,6 +196,36 @@ public class BookingControllerTests {
     }
 
     @Test
+    public void testGetAllBookingByState_InvalidPageFrom() throws Exception {
+        Long invalidUserId = -1L;
+        String state = "WAITING";
+        int from = -1;
+        int size = 10;
+
+        mockMvc.perform(get("/bookings")
+                        .header("X-Sharer-User-Id", invalidUserId)
+                        .param("state", state)
+                        .param("from", String.valueOf(from))
+                        .param("size", String.valueOf(size)))
+                .andExpect(status().isInternalServerError());
+    }
+
+    @Test
+    public void testGetAllBookingByState_InvalidPageSize() throws Exception {
+        Long invalidUserId = -1L;
+        String state = "WAITING";
+        int from = 0;
+        int size = -1;
+
+        mockMvc.perform(get("/bookings")
+                        .header("X-Sharer-User-Id", invalidUserId)
+                        .param("state", state)
+                        .param("from", String.valueOf(from))
+                        .param("size", String.valueOf(size)))
+                .andExpect(status().isInternalServerError());
+    }
+
+    @Test
     public void testGetAllBookingByState_InvalidUserId() throws Exception {
         Long invalidUserId = -1L;
         String state = "WAITING";
@@ -270,5 +300,35 @@ public class BookingControllerTests {
                         .param("from", String.valueOf(from))
                         .param("size", String.valueOf(size)))
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    public void testGetAllItemsBookings_InvalidPageFrom() throws Exception {
+        Long invalidUserId = 1L;
+        String state = "ALL";
+        int from = -1;
+        int size = 10;
+
+        mockMvc.perform(get("/bookings/owner")
+                        .header("X-Sharer-User-Id", invalidUserId)
+                        .param("state", state)
+                        .param("from", String.valueOf(from))
+                        .param("size", String.valueOf(size)))
+                .andExpect(status().isInternalServerError());
+    }
+
+    @Test
+    public void testGetAllItemsBookings_InvalidPageSize() throws Exception {
+        Long invalidUserId = 1L;
+        String state = "ALL";
+        int from = 0;
+        int size = -1;
+
+        mockMvc.perform(get("/bookings/owner")
+                        .header("X-Sharer-User-Id", invalidUserId)
+                        .param("state", state)
+                        .param("from", String.valueOf(from))
+                        .param("size", String.valueOf(size)))
+                .andExpect(status().isInternalServerError());
     }
 }
