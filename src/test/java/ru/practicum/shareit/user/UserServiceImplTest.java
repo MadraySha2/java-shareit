@@ -28,10 +28,7 @@ class UserServiceImplTest {
     private final ItemRepository itemRepository;
 
     private UserDto createUserDto(String name, String email) {
-        return UserDto.builder()
-                .name(name)
-                .email(email)
-                .build();
+        return UserDto.builder().name(name).email(email).build();
     }
 
     @BeforeEach
@@ -81,10 +78,7 @@ class UserServiceImplTest {
 
     @Test
     void updateUser_invalidUser() {
-        UserDto userDto = UserDto.builder()
-                .name("test")
-                .email("test@test.ru")
-                .build();
+        UserDto userDto = UserDto.builder().name("test").email("test@test.ru").build();
 
         assertThrows(NotFoundException.class, () -> userService.updateUser(100L, userDto));
     }
