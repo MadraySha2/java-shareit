@@ -243,9 +243,30 @@ public class BookingRepositoryIntegrationTest {
     void existsByBookerIdAndEndBeforeAndStatus() {
         User user = User.builder().name("TestUser").email("test@mail.com").build();
         entityManager.persist(user);
+
         Booking booking1 = Booking.builder().booker(user).end(LocalDateTime.now().minusHours(1)).status(Status.WAITING).build();
         entityManager.persist(booking1);
         Boolean exist = bookingRepository.existsByBookerIdAndEndBeforeAndStatus(user.getId(), LocalDateTime.now(), Status.WAITING);
         assertThat(exist).isTrue();
     }
+
+    @Test
+    void findAllByItemOwnerId() {
+        User user = User.builder().name("TestUser").email("test@mail.com").build();
+        entityManager.persist(user);
+        Item item1 = Item.builder().owner(user).build();
+        entityManager.persist(item1);
+        Item item2 = Item.builder().build();
+        entityManager.persist(item2);
+        Booking booking1 = Booking.builder().booker(user).item(item1).end(LocalDateTime.now().minusHours(1)).status(Status.WAITING).build();
+        entityManager.persist(booking1);
+        List<Booking> bookings = bookingRepository.findAllByItemOwnerId(user.getId(), PageRequest.of(0, 10)).getContent();
+        assertThat(bookings).isNotEmpty();
+        assertThat(bookings).hasSize(1);
+        assertThat(bookings).contains(booking1);
+        assertThat(bookings.get(0).getItem().getId()).isEqualTo(item1.getId().longValue());
+        assertThat(bookings.get(0).getItem().getId()).isNotEqualTo(item2.getId().longValue());
+    }
+
+    ;
 }
