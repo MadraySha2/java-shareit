@@ -198,7 +198,7 @@ public class BookingControllerTests {
     @Test
     public void testGetAllBookingByState_InvalidUserId() throws Exception {
         Long invalidUserId = -1L;
-        String state = "ALL";
+        String state = "WAITING";
         int from = 0;
         int size = 10;
 

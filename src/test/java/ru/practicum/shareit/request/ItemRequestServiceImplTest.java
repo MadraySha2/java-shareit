@@ -92,7 +92,7 @@ class ItemRequestServiceImplTest {
     @Test
     void getOwnRequests_invalidUser() {
         assertThrows(NotFoundException.class, () -> {
-            itemRequestService.getOwnRequests(1L, pageRequest);
+            itemRequestService.getOwnRequests(100L, pageRequest);
         });
     }
 
