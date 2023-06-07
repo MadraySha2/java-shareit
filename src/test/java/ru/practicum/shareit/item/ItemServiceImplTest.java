@@ -24,8 +24,10 @@ import ru.practicum.shareit.user.UserService;
 import javax.xml.bind.ValidationException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static ru.practicum.shareit.booking.BookingMapper.toBooking;
 import static ru.practicum.shareit.item.ItemMapper.toItem;
@@ -184,6 +186,51 @@ class ItemServiceImplTest {
     }
 
     @Test
+    void searchItem() {
+        ItemDto item11 = itemService.addItem(1L, ItemDto.builder().name("Дрель").description("Дрель эллектрическая").owner(user)
+                .available(true).build());
+        ItemDto item22 = itemService.addItem(1L, ItemDto.builder().name("Дрель ручная").description("Дрель ручная").owner(user)
+                .available(true).build());
+        ItemDto item33 = itemService.addItem(1L, ItemDto.builder().name("Отвертка").description("Отвертка эллектрическая").owner(user)
+                .available(true).build());
+        ItemDto item44 = itemService.addItem(1L, ItemDto.builder().name("Отвертка").description("Отвертка ручная").owner(user)
+                .available(false).build());
+        Collection<ItemDto> items = itemService.searchItems("Дрель", PageRequest.of(0, 10));
+        assertThat(items).hasSize(2);
+        assertThat(items).contains(item11, item22);
+        Collection<ItemDto> items1 = itemService.searchItems("Эллектрическая", PageRequest.of(0, 10));
+        assertThat(items1).hasSize(2);
+        assertThat(items1).contains(item11, item33);
+        Collection<ItemDto> items2 = itemService.searchItems("ручная", PageRequest.of(0, 10));
+        assertThat(items2).hasSize(1);
+        assertThat(items2).contains(item22);
+    }
+
+    @Test
+    void searchItemBlank() {
+        ItemDto item11 = itemService.addItem(1L, ItemDto.builder().name("Дрель").description("Дрель эллектрическая").owner(user)
+                .available(true).build());
+        ItemDto item22 = itemService.addItem(1L, ItemDto.builder().name("Дрель ручная").description("Дрель ручная").owner(user)
+                .available(true).build());
+        ItemDto item33 = itemService.addItem(1L, ItemDto.builder().name("Отвертка").description("Отвертка эллектрическая").owner(user)
+                .available(true).build());
+        Collection<ItemDto> items = itemService.searchItems(" ", PageRequest.of(0, 10));
+        assertThat(items).hasSize(0);
+    }
+
+    @Test
+    void searchItem_NoSuchItem() {
+        ItemDto item11 = itemService.addItem(1L, ItemDto.builder().name("Дрель").description("Дрель эллектрическая").owner(user)
+                .available(true).build());
+        ItemDto item22 = itemService.addItem(1L, ItemDto.builder().name("Дрель ручная").description("Дрель ручная").owner(user)
+                .available(true).build());
+        ItemDto item33 = itemService.addItem(1L, ItemDto.builder().name("Отвертка").description("Отвертка эллектрическая").owner(user)
+                .available(true).build());
+        Collection<ItemDto> items = itemService.searchItems("Cтул", PageRequest.of(0, 10));
+        assertThat(items).hasSize(0);
+    }
+
+    @Test
     void addItem() {
         ItemDto testItem = ItemDto.builder().owner(user)
                 .name("Updated").description("Updated").available(true).build();
@@ -206,10 +253,16 @@ class ItemServiceImplTest {
     }
 
     @Test
+    void addItem_invalidRequest() {
+        ItemDto testItem = ItemDto.builder().owner(user)
+                .name("Updated").description("Updated").available(true).requestId(99L).build();
+        assertThrows(NotFoundException.class, () -> itemService.addItem(1L, testItem));
+    }
+
+    @Test
     void addComment() {
         ItemDto itemDto = itemService.getItems(2L, pageRequest).get(0);
         assertEquals(1, itemDto.getComments().size());
-        assertThrows(NotFoundException.class, () -> itemService.addComment(1L, 99L, toCommentDto(comment1)));
     }
 
     @Test

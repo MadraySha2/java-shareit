@@ -10,6 +10,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.test.annotation.DirtiesContext;
 import ru.practicum.shareit.exceptions.NotFoundException;
+import ru.practicum.shareit.item.Item;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserServiceImpl;
 
@@ -18,6 +19,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static ru.practicum.shareit.item.ItemMapper.toItem;
+import static ru.practicum.shareit.item.ItemMapper.toItemDto;
 import static ru.practicum.shareit.request.ItemRequestMapper.toRequestDto;
 import static ru.practicum.shareit.user.UserMapper.toUser;
 import static ru.practicum.shareit.user.UserMapper.toUserDto;
@@ -40,6 +43,8 @@ class ItemRequestServiceImplTest {
     private ItemRequest itemRequest = new ItemRequest();
     private ItemRequest itemRequest1 = new ItemRequest();
 
+    private Item item = new Item();
+
     PageRequest pageRequest = PageRequest.of(0, 10).withSort(Sort.by("created").descending());
     private final Timestamp now = Timestamp.valueOf(LocalDateTime.now());
 
@@ -53,6 +58,7 @@ class ItemRequestServiceImplTest {
         user = toUser(userService.addUser(toUserDto(user2)));
         itemRequest = ItemRequest.builder().id(1L).requestor(user).created(now).description("test").build();
         itemRequest1 = ItemRequest.builder().id(2L).requestor(user1).created(now).description("test1").build();
+        item = Item.builder().id(1L).owner(user).description("Test").name("Test").request(itemRequest).available(true).build();
     }
 
     @Test
@@ -75,6 +81,14 @@ class ItemRequestServiceImplTest {
     }
 
     @Test
+    void addRequest_selfItem() {
+        assertThrows(NotFoundException.class, () -> {
+            ItemRequestDto itemRequestDto = toRequestDto(itemRequest);
+            itemRequestService.addRequest(1L, itemRequestDto);
+        });
+    }
+
+    @Test
     void getOwnRequests() {
         ItemRequestDto testItem = itemRequestService.addRequest(1L, toRequestDto(itemRequest));
         ItemRequestDto testItem2 = itemRequestService.addRequest(2L, toRequestDto(itemRequest1));
@@ -89,7 +103,7 @@ class ItemRequestServiceImplTest {
     @Test
     void getOwnRequests_invalidUser() {
         assertThrows(NotFoundException.class, () -> {
-            itemRequestService.getOwnRequests(100L, pageRequest);
+            itemRequestService.getOwnRequests(1L, pageRequest);
         });
     }
 

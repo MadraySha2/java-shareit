@@ -118,7 +118,7 @@ public class ItemServiceImpl implements ItemService {
         return toCommentDto(commentRepository.save(comment));
     }
 
-    public ItemDto setBookings(ItemDto itemDto, Long userId) {
+    private ItemDto setBookings(ItemDto itemDto, Long userId) {
         if (itemDto.getOwner().getId().longValue() == userId.longValue()) {
             itemDto.setLastBooking(bookingRepository.findByItemId(itemDto.getId(), Sort.by(Sort.Direction.DESC, "start")).stream().filter(booking -> booking.getStart().isBefore(LocalDateTime.now())).map(BookingMapper::toItemBookingDto).max(Comparator.comparing(BookingItemDto::getEnd)).orElse(null));
             itemDto.setNextBooking(bookingRepository.findByItemId(itemDto.getId(), Sort.by(Sort.Direction.ASC, "start")).stream().filter(booking -> !booking.getStatus().equals(Status.REJECTED)).map(BookingMapper::toItemBookingDto).filter(booking -> booking.getStart().isAfter(LocalDateTime.now())).findFirst().orElse(null));
@@ -127,7 +127,7 @@ public class ItemServiceImpl implements ItemService {
         return itemDto;
     }
 
-    public List<CommentDto> getComments(Long itemId) {
+    private List<CommentDto> getComments(Long itemId) {
         return commentRepository.findByItemId(itemId).stream().map(CommentMapper::toCommentDto).collect(Collectors.toList());
     }
 
