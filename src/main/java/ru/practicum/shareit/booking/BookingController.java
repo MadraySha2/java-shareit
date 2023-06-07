@@ -1,9 +1,13 @@
 package ru.practicum.shareit.booking;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.PositiveOrZero;
 import javax.xml.bind.ValidationException;
 import java.util.List;
 
@@ -31,15 +35,31 @@ public class BookingController {
         return bookingService.getBookingById(id, bookingId);
     }
 
+    @Validated
     @GetMapping()
     public List<BookingDto> getAllBookingByState(@RequestHeader("X-Sharer-User-Id") Long id,
-                                                 @RequestParam(defaultValue = "ALL") String state)  {
-        return bookingService.getAllBookingByState(id, state);
+                                                 @RequestParam(defaultValue = "ALL") String state,
+                                                 @RequestParam(defaultValue = "0") @PositiveOrZero int from,
+                                                 @RequestParam(defaultValue = "10") @PositiveOrZero int size) throws ValidationException {
+
+        if (from < 0 || size < 0) {
+            throw new ValidationException("");
+        }
+        return bookingService.getAllBookingByState(id, state,
+                PageRequest.of(from > 0 ? from / size : 0, size, Sort.by(Sort.Direction.DESC, "start")));
     }
 
+    @Validated
     @GetMapping("/owner")
     public List<BookingDto> getAllItemsBookings(@RequestHeader("X-Sharer-User-Id") Long id,
-                                                @RequestParam(defaultValue = "ALL") String state) {
-        return bookingService.getAllOwnersBookingByState(id, state);
+                                                @RequestParam(defaultValue = "ALL") String state,
+                                                @RequestParam(defaultValue = "0") @PositiveOrZero int from,
+                                                @RequestParam(defaultValue = "10") @PositiveOrZero int size) throws ValidationException {
+        if (from < 0 || size < 0) {
+            throw new ValidationException("");
+        }
+        return bookingService.getAllOwnersBookingByState(id, state,
+                PageRequest.of(from > 0 ? from / size : 0, size, Sort.by(Sort.Direction.DESC, "start")));
     }
+
 }

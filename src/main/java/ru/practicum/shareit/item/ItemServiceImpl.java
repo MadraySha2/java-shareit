@@ -2,6 +2,7 @@ package ru.practicum.shareit.item;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.booking.BookingItemDto;
@@ -14,6 +15,8 @@ import ru.practicum.shareit.item.comment.Comment;
 import ru.practicum.shareit.item.comment.CommentDto;
 import ru.practicum.shareit.item.comment.CommentMapper;
 import ru.practicum.shareit.item.comment.CommentRepository;
+import ru.practicum.shareit.request.ItemRequest;
+import ru.practicum.shareit.request.ItemRequestsRepository;
 import ru.practicum.shareit.user.UserService;
 
 import javax.transaction.Transactional;
@@ -35,6 +38,8 @@ public class ItemServiceImpl implements ItemService {
 
     private final ItemRepository itemRepository;
 
+    private final ItemRequestsRepository requestsRepository;
+
     private final BookingRepository bookingRepository;
 
     private final CommentRepository commentRepository;
@@ -42,7 +47,7 @@ public class ItemServiceImpl implements ItemService {
     private final UserService userService;
 
 
-    public List<ItemDto> getItems(Long id) {
+    public List<ItemDto> getItems(Long id, Pageable pageable) {
         List<ItemDto> dtoList = itemRepository.findAllByOwnerId(id).stream()
                 .map(ItemMapper::toItemDto).collect(Collectors.toList());
         dtoList.forEach(itemDto -> itemDto.setComments(getComments(itemDto.getId())));
@@ -57,11 +62,11 @@ public class ItemServiceImpl implements ItemService {
         return item;
     }
 
-    public List<ItemDto> searchItems(String text) {
+    public List<ItemDto> searchItems(String text, Pageable pageable) {
         if (text.isBlank()) {
             return new ArrayList<>();
         }
-        return itemRepository.findByNameOrDescriptionAvailable(text)
+        return itemRepository.findByNameOrDescriptionAvailable(text, pageable)
                 .stream().map(ItemMapper::toItemDto).collect(Collectors.toList());
     }
 
@@ -85,7 +90,14 @@ public class ItemServiceImpl implements ItemService {
     @Transactional
     public ItemDto addItem(Long userId, ItemDto itemDto) {
         itemDto.setOwner(toUser(userService.getUserById(userId)));
-        return toItemDto(itemRepository.save(toItem(itemDto)));
+        Item item = toItem(itemDto);
+        if (itemDto.getRequestId() != null) {
+            ItemRequest itemRequest = requestsRepository
+                    .findById(itemDto.getRequestId())
+                    .orElseThrow(() -> new NotFoundException("Request not found!"));
+            item.setRequest(itemRequest);
+        }
+        return toItemDto(itemRepository.save(item));
     }
 
     @Transactional

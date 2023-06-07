@@ -1,5 +1,6 @@
 package ru.practicum.shareit.booking;
 
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
 
@@ -14,7 +15,7 @@ public interface BookingService {
 
     BookingDto getBookingById(@RequestHeader("X-Sharer-User-Id") Long id, @PathVariable Long bookingId);
 
-    List<BookingDto> getAllBookingByState(Long id, String state);
+    List<BookingDto> getAllBookingByState(Long id, String state, Pageable pageable);
 
-    List<BookingDto> getAllOwnersBookingByState(Long id, String state);
+    List<BookingDto> getAllOwnersBookingByState(Long id, String state, Pageable pageable);
 }
