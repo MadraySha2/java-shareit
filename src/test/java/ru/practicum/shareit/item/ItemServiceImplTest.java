@@ -147,13 +147,18 @@ class ItemServiceImplTest {
     }
 
     @Test
+    void getItemById_invalidUser() {
+        assertThrows(NotFoundException.class, () -> itemService.getItemById(99L, 1L));
+    }
+
+    @Test
     void getItemById_invalidItem() {
         assertThrows(NotFoundException.class, () -> itemService.getItemById(2L, 99L));
     }
 
     @Test
     void updateItem() {
-        ItemDto itemDto = ItemDto.builder().id(999L).owner(user)
+        ItemDto itemDto = ItemDto.builder().id(999L)
                 .name("Updated").description("Updated").owner(user2).available(false).build();
         itemService.updateItem(1L, itemDto, 1L);
         ItemDto testItem = itemService.getItemById(1L, 1L);
@@ -165,10 +170,17 @@ class ItemServiceImplTest {
     }
 
     @Test
-    void updateItem_invalidUser() {
-        ItemDto itemDto = ItemDto.builder().id(999L).owner(user)
+    void updateItem_invalidOwner() {
+        ItemDto itemDto = ItemDto.builder().id(999L)
                 .name("Updated").description("Updated").owner(user2).available(false).build();
-        assertThrows(NotFoundException.class, () -> itemService.updateItem(2L, itemDto, 1L));
+        assertThrows(NotFoundException.class, () -> itemService.updateItem(1L, itemDto, 2L));
+    }
+
+    @Test
+    void updateItem_invalidUser() {
+        ItemDto itemDto = ItemDto.builder().id(999L)
+                .name("Updated").description("Updated").owner(user2).available(false).build();
+        assertThrows(NotFoundException.class, () -> itemService.updateItem(999L, itemDto, 1L));
     }
 
     @Test

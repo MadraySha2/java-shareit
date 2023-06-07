@@ -17,6 +17,7 @@ import ru.practicum.shareit.item.comment.CommentMapper;
 import ru.practicum.shareit.item.comment.CommentRepository;
 import ru.practicum.shareit.request.ItemRequest;
 import ru.practicum.shareit.request.ItemRequestsRepository;
+import ru.practicum.shareit.user.UserRepository;
 import ru.practicum.shareit.user.UserService;
 
 import javax.transaction.Transactional;
@@ -46,8 +47,13 @@ public class ItemServiceImpl implements ItemService {
 
     private final UserService userService;
 
+    private final UserRepository userRepository;
+
 
     public List<ItemDto> getItems(Long id, Pageable pageable) {
+        if(!userRepository.existsById(id)){
+            throw new NotFoundException("User Not found");
+        }
         List<ItemDto> dtoList = itemRepository.findAllByOwnerId(id).stream()
                 .map(ItemMapper::toItemDto).collect(Collectors.toList());
         dtoList.forEach(itemDto -> itemDto.setComments(getComments(itemDto.getId())));
@@ -56,6 +62,9 @@ public class ItemServiceImpl implements ItemService {
     }
 
     public ItemDto getItemById(Long userId, Long itemId) {
+        if(!userRepository.existsById(userId)){
+            throw new NotFoundException("User Not found");
+        }
         ItemDto item = toItemDto(itemRepository.findById(itemId).orElseThrow(() -> new NotFoundException("Item not found")));
         item = setBookings(item, userId);
         item.setComments(getComments(itemId));
