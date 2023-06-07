@@ -226,6 +226,38 @@ class BookingServiceImplTest {
     }
 
     @Test
+    void getAllBookingByStateAll() {
+        bookingService.approveBooking(1L, 1L, true);
+        bookingService.approveBooking(1L, 3L, false);
+        List<BookingDto> testBookingStatusAll = bookingService.getAllBookingByState(2L, "ALL", pageRequest);
+        assertEquals(3, testBookingStatusAll.size());
+        assertEquals(3L, testBookingStatusAll.get(0).getId());
+        assertEquals(1L, testBookingStatusAll.get(1).getId());
+        assertEquals(2L, testBookingStatusAll.get(2).getId());
+    }
+
+    @Test
+    void getAllBookingByStateAll_invalidUser() {
+        assertThrows(NotFoundException.class, () -> bookingService.getAllBookingByState(999L, "ALL", pageRequest));
+    }
+
+    @Test
+    void getAllOwnerBookingByStateAll() {
+        bookingService.approveBooking(1L, 1L, true);
+        bookingService.approveBooking(1L, 3L, false);
+        List<BookingDto> testBookingStatusAll = bookingService.getAllOwnersBookingByState(1L, "ALL", pageRequest);
+        assertEquals(3, testBookingStatusAll.size());
+        assertEquals(3L, testBookingStatusAll.get(0).getId());
+        assertEquals(1L, testBookingStatusAll.get(1).getId());
+        assertEquals(2L, testBookingStatusAll.get(2).getId());
+    }
+
+    @Test
+    void getAllOwnerBookingByStateAll_InvalidUser() {
+        assertThrows(NotFoundException.class, () -> bookingService.getAllOwnersBookingByState(999L, "ALL", pageRequest));
+    }
+
+    @Test
     void getAllBookingByStatePast() {
         bookingService.approveBooking(1L, 1L, true);
         bookingService.approveBooking(1L, 3L, false);
