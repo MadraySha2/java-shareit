@@ -30,8 +30,6 @@ public class ItemRepositoryIntegrationTest {
         entityManager.persist(user);
         User user1 = User.builder().name("TestUser1").email("test1@mail.com").build();
         entityManager.persist(user1);
-        user.setId(1L);
-        user1.setId(2L);
         Item item1 = Item.builder().owner(user).build();
         entityManager.persist(item1);
         Item item2 = Item.builder().owner(user).build();
@@ -39,7 +37,7 @@ public class ItemRepositoryIntegrationTest {
         Item item3 = Item.builder().owner(user1).build();
         entityManager.persist(item3);
         entityManager.flush();
-        Collection<Item> items = itemRepository.findAllByOwnerId(1L);
+        Collection<Item> items = itemRepository.findAllByOwnerId(user.getId());
 
         assertThat(items).hasSize(2);
         assertThat(items).contains(item1, item2);
