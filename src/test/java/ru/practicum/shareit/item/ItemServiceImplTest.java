@@ -204,12 +204,14 @@ class ItemServiceImplTest {
         assertEquals(1, itemDto.getComments().size());
         assertThrows(NotFoundException.class, () -> itemService.addComment(1L, 99L, toCommentDto(comment1)));
     }
+
     @Test
     void addComment_invalidUser() {
         assertThrows(NotFoundException.class, () -> itemService.addComment(99L, 2L, toCommentDto(comment1)));
     }
+
     @Test
-    void addComment_invalidItem(){
+    void addComment_invalidItem() {
         assertThrows(NotFoundException.class, () -> itemService.addComment(1L, 99L, toCommentDto(comment1)));
     }
 }
