@@ -10,6 +10,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.test.annotation.DirtiesContext;
 import ru.practicum.shareit.exceptions.DuplicateException;
+import ru.practicum.shareit.exceptions.NotAvailableException;
+import ru.practicum.shareit.exceptions.NotFoundException;
+import ru.practicum.shareit.exceptions.NotSupportedStateException;
 import ru.practicum.shareit.item.Item;
 import ru.practicum.shareit.item.ItemService;
 import ru.practicum.shareit.user.User;
@@ -19,8 +22,7 @@ import javax.xml.bind.ValidationException;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static ru.practicum.shareit.item.ItemMapper.toItem;
 import static ru.practicum.shareit.item.ItemMapper.toItemDto;
 import static ru.practicum.shareit.user.UserMapper.toUser;
@@ -87,6 +89,30 @@ class BookingServiceImplTest {
     }
 
     @Test
+    void addBooking_InvalidUserId() {
+        BookingEntryDto bookingEntryDto = BookingEntryDto.builder()
+                .itemId(item.getId())
+                .start(LocalDateTime.now().minusHours(1))
+                .end(LocalDateTime.now())
+                .build();
+
+        assertThrows(NotFoundException.class, () ->
+                bookingService.addBooking(100L, bookingEntryDto));
+    }
+
+    @Test
+    void addBooking_InvalidItemId() {
+        BookingEntryDto bookingEntryDto = BookingEntryDto.builder()
+                .itemId(100L)
+                .start(LocalDateTime.now().minusHours(1))
+                .end(LocalDateTime.now())
+                .build();
+
+        assertThrows(NotFoundException.class, () ->
+                bookingService.addBooking(user.getId(), bookingEntryDto));
+    }
+
+    @Test
     void approveBooking() {
         bookingService.approveBooking(1L, 1L, true);
         bookingService.approveBooking(1L, 3L, false);
@@ -98,8 +124,31 @@ class BookingServiceImplTest {
         List<BookingDto> testBookingStatusCurrent = bookingService.getAllBookingByState(2L, "CURRENT", pageRequest);
         assertEquals(1, testBookingStatusCurrent.size());
         assertEquals(1L, testBookingStatusCurrent.get(0).getId());
+    }
 
+    @Test
+    void approveBooking_NotOwner() {
+        assertThrows(NotFoundException.class,
+                () -> bookingService.approveBooking(2L, 1L, true));
+    }
 
+    @Test
+    void approveBooking_InvalidUser() {
+        assertThrows(NotFoundException.class,
+                () -> bookingService.approveBooking(100L, 1L, true));
+    }
+
+    @Test
+    void approveBooking_IvalidBooking() {
+        assertThrows(NotFoundException.class,
+                () -> bookingService.approveBooking(1L, 100L, true));
+    }
+
+    @Test
+    void approveBooking_Duplicate() {
+        bookingService.approveBooking(1L, 1L, true);
+        assertThrows(NotAvailableException.class,
+                () -> bookingService.approveBooking(1L, 1L, true));
     }
 
     @Test
@@ -115,45 +164,130 @@ class BookingServiceImplTest {
     }
 
     @Test
-    void getAllBookingByState() {
+    void getBookingById_InvalidUser() {
+        assertThrows(NotFoundException.class,
+                () -> bookingService.getBookingById(99L, 1L));
+    }
+
+    @Test
+    void getBookingById_InvalidItem() {
+        assertThrows(NotFoundException.class,
+                () -> bookingService.getBookingById(1L, 111L));
+    }
+
+    @Test
+    void getAllBookingByStateWaiting() {
         bookingService.approveBooking(1L, 1L, true);
         bookingService.approveBooking(1L, 3L, false);
         List<BookingDto> testBookings = bookingService.getAllBookingByState(2L, "WAITING", pageRequest);
         assertEquals(1, testBookings.size());
+    }
+
+    @Test
+    void getAllBooking_InvalidUser() {
+        assertThrows(NotFoundException.class,
+                () -> bookingService.getAllBookingByState(99L, "WAITING", pageRequest));
+    }
+
+    @Test
+    void getAllBooking_InvalidState() {
+        assertThrows(NotSupportedStateException.class,
+                () -> bookingService.getAllBookingByState(1L, "NOTSUPP", pageRequest));
+    }
+
+    @Test
+    void getAllBookingByStateRejected() {
+        bookingService.approveBooking(1L, 1L, true);
+        bookingService.approveBooking(1L, 3L, false);
         List<BookingDto> testBookingStatusRejected = bookingService.getAllBookingByState(2L, "REJECTED", pageRequest);
         assertEquals(1, testBookingStatusRejected.size());
         assertEquals(3L, testBookingStatusRejected.get(0).getId());
+    }
+
+    @Test
+    void getAllBookingByStateCurrent() {
+        bookingService.approveBooking(1L, 1L, true);
+        bookingService.approveBooking(1L, 3L, false);
         List<BookingDto> testBookingStatusCurrent = bookingService.getAllBookingByState(2L, "CURRENT", pageRequest);
         assertEquals(1, testBookingStatusCurrent.size());
         assertEquals(1L, testBookingStatusCurrent.get(0).getId());
+    }
+
+    @Test
+    void getAllBookingByStatePast() {
+        bookingService.approveBooking(1L, 1L, true);
+        bookingService.approveBooking(1L, 3L, false);
         List<BookingDto> testBookingStatusPast = bookingService.getAllBookingByState(2L, "PAST", pageRequest);
         assertEquals(1, testBookingStatusPast.size());
         assertEquals(2L, testBookingStatusPast.get(0).getId());
+    }
+
+    @Test
+    void getAllBookingByStateFuture() {
+        bookingService.approveBooking(1L, 1L, true);
+        bookingService.approveBooking(1L, 3L, false);
         List<BookingDto> testBookingStatusFuture = bookingService.getAllBookingByState(2L, "FUTURE", pageRequest);
         assertEquals(1, testBookingStatusFuture.size());
         assertEquals(3L, testBookingStatusFuture.get(0).getId());
     }
 
     @Test
-    void getAllOwnersBookingByState() {
+    void getAllOwnersBookingByStateWaiting() {
         bookingService.approveBooking(1L, 1L, true);
         bookingService.approveBooking(1L, 3L, false);
         List<BookingDto> testBookings = bookingService.getAllOwnersBookingByState(1L, "WAITING", pageRequest);
         assertEquals(1, testBookings.size());
         assertEquals(2L, testBookings.get(0).getId());
         assertEquals(1L, testBookings.get(0).getItem().getOwner().getId());
+    }
+
+    @Test
+    void getAllOwnersBooking_InvalidUser() {
+        assertThrows(NotFoundException.class,
+                () -> bookingService.getAllOwnersBookingByState(99L, "WAITING", pageRequest));
+    }
+
+    @Test
+    void getAllOwnersBooking_InvalidState() {
+        assertThrows(NotSupportedStateException.class,
+                () -> bookingService.getAllOwnersBookingByState(1L, "NOTSUPP", pageRequest));
+    }
+
+    @Test
+    void getAllOwnersBookingByStateRejected() {
+        bookingService.approveBooking(1L, 1L, true);
+        bookingService.approveBooking(1L, 3L, false);
         List<BookingDto> testBookingStatusRejected = bookingService.getAllOwnersBookingByState(1L, "REJECTED", pageRequest);
         assertEquals(1, testBookingStatusRejected.size());
         assertEquals(3L, testBookingStatusRejected.get(0).getId());
         assertEquals(1L, testBookingStatusRejected.get(0).getItem().getOwner().getId());
+    }
+
+    @Test
+    void getAllOwnersBookingByStateCurrent() {
+        bookingService.approveBooking(1L, 1L, true);
+        bookingService.approveBooking(1L, 3L, false);
         List<BookingDto> testBookingStatusCurrent = bookingService.getAllOwnersBookingByState(1L, "CURRENT", pageRequest);
         assertEquals(1, testBookingStatusCurrent.size());
         assertEquals(1L, testBookingStatusCurrent.get(0).getId());
         assertEquals(1L, testBookingStatusCurrent.get(0).getItem().getOwner().getId());
+    }
+
+    @Test
+    void getAllOwnersBookingByStatePast() {
+        bookingService.approveBooking(1L, 1L, true);
+        bookingService.approveBooking(1L, 3L, false);
         List<BookingDto> testBookingStatusPast = bookingService.getAllOwnersBookingByState(1L, "PAST", pageRequest);
         assertEquals(1, testBookingStatusPast.size());
         assertEquals(2L, testBookingStatusPast.get(0).getId());
         assertEquals(1L, testBookingStatusPast.get(0).getItem().getOwner().getId());
+    }
+
+
+    @Test
+    void getAllOwnersBookingByStateFuture() {
+        bookingService.approveBooking(1L, 1L, true);
+        bookingService.approveBooking(1L, 3L, false);
         List<BookingDto> testBookingStatusFuture = bookingService.getAllOwnersBookingByState(1L, "FUTURE", pageRequest);
         assertEquals(1, testBookingStatusFuture.size());
         assertEquals(3L, testBookingStatusFuture.get(0).getId());
