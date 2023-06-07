@@ -28,7 +28,7 @@ public class ItemRequestDtoJsonTest {
                 .created(Timestamp.valueOf(LocalDateTime.of(2023, 5, 1, 10, 0))).build();
 
         String expectedJson = "{\"id\":1,\"description\":\"Test description\",\"requestor\"" +
-                ":{\"id\":null,\"name\":null,\"email\":null},\"created\":\"2023-05-01T07:00:00.000+00:00\"}";
+                ":{\"id\":null,\"name\":null,\"email\":null},\"created\":\"2023-05-01T10:00:00.000+00:00\"}";
         String actualJson = objectMapper.writeValueAsString(itemRequestDto);
 
         assertEquals(expectedJson, actualJson);
@@ -38,7 +38,7 @@ public class ItemRequestDtoJsonTest {
     public void testDeserializeFromJson() throws JsonProcessingException {
         objectMapper.registerModule(new JavaTimeModule());
         String json = "{\"id\":1,\"description\":\"Test description\"," +
-                "\"requestor\":{},\"created\":\"2023-05-01T07:00:00.000+00:00\"}";
+                "\"requestor\":{},\"created\":\"2023-05-01T10:00:00.000+00:00\"}";
         ItemRequestDto expectedItemRequestDto = ItemRequestDto.builder().id(1L).description("Test description").requestor(User.builder().build()).created(Timestamp.valueOf(LocalDateTime.of(2023, 5, 1, 10, 0))).build();
 
         ItemRequestDto actualItemRequestDto = objectMapper.readValue(json, ItemRequestDto.class);
