@@ -94,62 +94,37 @@ class BookingServiceImplTest {
 
     @Test
     void addBooking_InvalidUserId() {
-        BookingEntryDto bookingEntryDto = BookingEntryDto.builder()
-                .itemId(item.getId())
-                .start(LocalDateTime.now().minusHours(1))
-                .end(LocalDateTime.now())
-                .build();
+        BookingEntryDto bookingEntryDto = BookingEntryDto.builder().itemId(item.getId()).start(LocalDateTime.now().minusHours(1)).end(LocalDateTime.now()).build();
 
-        assertThrows(NotFoundException.class, () ->
-                bookingService.addBooking(100L, bookingEntryDto));
+        assertThrows(NotFoundException.class, () -> bookingService.addBooking(100L, bookingEntryDto));
     }
 
     @Test
     void addBooking_InvalidItemId() {
-        BookingEntryDto bookingEntryDto = BookingEntryDto.builder()
-                .itemId(100L)
-                .start(LocalDateTime.now().minusHours(1))
-                .end(LocalDateTime.now())
-                .build();
+        BookingEntryDto bookingEntryDto = BookingEntryDto.builder().itemId(100L).start(LocalDateTime.now().minusHours(1)).end(LocalDateTime.now()).build();
 
-        assertThrows(NotFoundException.class, () ->
-                bookingService.addBooking(user.getId(), bookingEntryDto));
+        assertThrows(NotFoundException.class, () -> bookingService.addBooking(user.getId(), bookingEntryDto));
     }
 
     @Test
     void addBooking_OwnItem() {
-        BookingEntryDto bookingEntryDto = BookingEntryDto.builder()
-                .itemId(1L)
-                .start(LocalDateTime.now().plusHours(1))
-                .end(LocalDateTime.now().plusHours(2))
-                .build();
+        BookingEntryDto bookingEntryDto = BookingEntryDto.builder().itemId(1L).start(LocalDateTime.now().plusHours(1)).end(LocalDateTime.now().plusHours(2)).build();
 
-        assertThrows(NotFoundException.class, () ->
-                bookingService.addBooking(user.getId(), bookingEntryDto));
+        assertThrows(NotFoundException.class, () -> bookingService.addBooking(user.getId(), bookingEntryDto));
     }
 
     @Test
     void addBooking_Unavailable() {
-        BookingEntryDto bookingEntryDto = BookingEntryDto.builder()
-                .itemId(3L)
-                .start(LocalDateTime.now().minusHours(1))
-                .end(LocalDateTime.now().minusHours(2))
-                .build();
+        BookingEntryDto bookingEntryDto = BookingEntryDto.builder().itemId(3L).start(LocalDateTime.now().minusHours(1)).end(LocalDateTime.now().minusHours(2)).build();
 
-        assertThrows(NotAvailableException.class, () ->
-                bookingService.addBooking(user.getId(), bookingEntryDto));
+        assertThrows(NotAvailableException.class, () -> bookingService.addBooking(user.getId(), bookingEntryDto));
     }
 
     @Test
     void addBooking_InvalidDate() {
-        BookingEntryDto bookingEntryDto = BookingEntryDto.builder()
-                .itemId(1L)
-                .start(LocalDateTime.now().minusHours(1))
-                .end(LocalDateTime.now().minusHours(2))
-                .build();
+        BookingEntryDto bookingEntryDto = BookingEntryDto.builder().itemId(1L).start(LocalDateTime.now().minusHours(1)).end(LocalDateTime.now().minusHours(2)).build();
 
-        assertThrows(NotAvailableException.class, () ->
-                bookingService.addBooking(user.getId(), bookingEntryDto));
+        assertThrows(NotAvailableException.class, () -> bookingService.addBooking(user.getId(), bookingEntryDto));
     }
 
     @Test
@@ -173,27 +148,23 @@ class BookingServiceImplTest {
 
     @Test
     void approveBooking_NotOwner() {
-        assertThrows(NotFoundException.class,
-                () -> bookingService.approveBooking(2L, 1L, true));
+        assertThrows(NotFoundException.class, () -> bookingService.approveBooking(2L, 1L, true));
     }
 
     @Test
     void approveBooking_InvalidUser() {
-        assertThrows(NotFoundException.class,
-                () -> bookingService.approveBooking(100L, 1L, true));
+        assertThrows(NotFoundException.class, () -> bookingService.approveBooking(100L, 1L, true));
     }
 
     @Test
     void approveBooking_IvalidBooking() {
-        assertThrows(NotFoundException.class,
-                () -> bookingService.approveBooking(1L, 100L, true));
+        assertThrows(NotFoundException.class, () -> bookingService.approveBooking(1L, 100L, true));
     }
 
     @Test
     void approveBooking_Duplicate() {
         bookingService.approveBooking(1L, 1L, true);
-        assertThrows(NotAvailableException.class,
-                () -> bookingService.approveBooking(1L, 1L, true));
+        assertThrows(NotAvailableException.class, () -> bookingService.approveBooking(1L, 1L, true));
     }
 
     @Test
@@ -210,14 +181,12 @@ class BookingServiceImplTest {
 
     @Test
     void getBookingById_InvalidUser() {
-        assertThrows(NotFoundException.class,
-                () -> bookingService.getBookingById(99L, 1L));
+        assertThrows(NotFoundException.class, () -> bookingService.getBookingById(99L, 1L));
     }
 
     @Test
     void getBookingById_InvalidItem() {
-        assertThrows(NotFoundException.class,
-                () -> bookingService.getBookingById(1L, 111L));
+        assertThrows(NotFoundException.class, () -> bookingService.getBookingById(1L, 111L));
     }
 
     @Test
@@ -230,14 +199,12 @@ class BookingServiceImplTest {
 
     @Test
     void getAllBooking_InvalidUser() {
-        assertThrows(NotFoundException.class,
-                () -> bookingService.getAllBookingByState(99L, "WAITING", pageRequest));
+        assertThrows(NotFoundException.class, () -> bookingService.getAllBookingByState(99L, "WAITING", pageRequest));
     }
 
     @Test
     void getAllBooking_InvalidState() {
-        assertThrows(NotSupportedStateException.class,
-                () -> bookingService.getAllBookingByState(1L, "NOTSUPP", pageRequest));
+        assertThrows(NotSupportedStateException.class, () -> bookingService.getAllBookingByState(1L, "NOTSUPP", pageRequest));
     }
 
     @Test
@@ -288,14 +255,12 @@ class BookingServiceImplTest {
 
     @Test
     void getAllOwnersBooking_InvalidUser() {
-        assertThrows(NotFoundException.class,
-                () -> bookingService.getAllOwnersBookingByState(99L, "WAITING", pageRequest));
+        assertThrows(NotFoundException.class, () -> bookingService.getAllOwnersBookingByState(99L, "WAITING", pageRequest));
     }
 
     @Test
     void getAllOwnersBooking_InvalidState() {
-        assertThrows(NotSupportedStateException.class,
-                () -> bookingService.getAllOwnersBookingByState(1L, "NOTSUPP", pageRequest));
+        assertThrows(NotSupportedStateException.class, () -> bookingService.getAllOwnersBookingByState(1L, "NOTSUPP", pageRequest));
     }
 
     @Test
