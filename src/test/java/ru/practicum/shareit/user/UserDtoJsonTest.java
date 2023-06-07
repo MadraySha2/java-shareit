@@ -3,9 +3,11 @@ package ru.practicum.shareit.user;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.autoconfigure.json.JsonTest;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@JsonTest
 public class UserDtoJsonTest {
 
     private final ObjectMapper objectMapper = new ObjectMapper();

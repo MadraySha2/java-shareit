@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.util.StdDateFormat;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.Test;
+import org.springframework.boot.test.autoconfigure.json.JsonTest;
 import ru.practicum.shareit.user.User;
 
 import java.sql.Timestamp;
@@ -13,6 +14,7 @@ import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+@JsonTest
 public class ItemRequestDtoJsonTest {
 
     ObjectMapper objectMapper = new ObjectMapper()
