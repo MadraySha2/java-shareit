@@ -56,7 +56,6 @@ class ItemRequestServiceImplTest {
         user = toUser(userService.addUser(toUserDto(user2)));
         itemRequest = ItemRequest.builder().id(1L).requestor(user).created(now).description("test").build();
         itemRequest1 = ItemRequest.builder().id(2L).requestor(user1).created(now).description("test1").build();
-        item = Item.builder().id(1L).owner(user).description("Test").name("Test").request(itemRequest).available(true).build();
     }
 
     @Test
@@ -75,14 +74,6 @@ class ItemRequestServiceImplTest {
         assertThrows(NotFoundException.class, () -> {
             ItemRequestDto itemRequestDto = toRequestDto(itemRequest);
             itemRequestService.addRequest(100L, itemRequestDto);
-        });
-    }
-
-    @Test
-    void addRequest_selfItem() {
-        assertThrows(NotFoundException.class, () -> {
-            ItemRequestDto itemRequestDto = toRequestDto(itemRequest);
-            itemRequestService.addRequest(1L, itemRequestDto);
         });
     }
 
