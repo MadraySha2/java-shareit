@@ -1,8 +1,13 @@
 package ru.practicum.shareit.item;
 
-import static ru.practicum.shareit.item.ItemServiceImpl.requests;
+import ru.practicum.shareit.request.ItemRequest;
+
+import java.util.HashMap;
+
 
 public class ItemMapper {
+
+    private static final HashMap<Long, ItemRequest> requests = new HashMap<>();
 
     public static ItemDto toItemDto(Item item) {
         return ItemDto.builder()
@@ -11,7 +16,7 @@ public class ItemMapper {
                 .owner(item.getOwner())
                 .description(item.getDescription())
                 .available(item.getAvailable())
-                .requestId(item.getRequest() != null ? item.getRequest().getId() : null).build();
+                .requestId(item.getRequest() != null ? item.getRequest().getRequestId() : null).build();
     }
 
     public static Item toItem(ItemDto itemDto) {

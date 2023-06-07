@@ -7,9 +7,6 @@ import ru.practicum.shareit.exceptions.DuplicateException;
 import javax.validation.Valid;
 import java.util.List;
 
-/**
- * TODO Sprint add-controllers.
- */
 @RestController
 @RequestMapping(path = "/users")
 @RequiredArgsConstructor
@@ -38,7 +35,7 @@ public class UserController {
     }
 
     @PatchMapping("/{userId}")
-    public UserDto updateUser(@PathVariable Long userId, @RequestBody User user) throws DuplicateException {
+    public UserDto updateUser(@PathVariable Long userId, @RequestBody UserDto user) throws DuplicateException {
         return service.updateUser(userId, user);
     }
 }
