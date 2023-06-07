@@ -14,6 +14,7 @@ import ru.practicum.shareit.exceptions.NotFoundException;
 
 import java.util.Collections;
 
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static ru.practicum.shareit.request.ItemRequestControllerTest.asJsonString;
 
@@ -47,17 +48,43 @@ class UserControllerTest {
 
     @Test
     void addUser() throws Exception {
+        Long id = 1L;
         UserDto userDto = UserDto.builder()
+                .id(1L)
                 .name("test")
                 .email("test@test.com")
                 .build();
 
+        Mockito.when(userService.addUser(Mockito.any(UserDto.class)))
+                .thenReturn(userDto);
         mockMvc.perform(MockMvcRequestBuilders.post("/users")
                         .content(asJsonString(userDto))
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1L))
+                .andExpect(jsonPath("$.name").value(userDto.getName()))
+                .andExpect(jsonPath("$.email").value(userDto.getEmail()));
     }
 
+    @Test
+    void updateUser() throws Exception {
+        Long id = 1L;
+        UserDto userDto = UserDto.builder()
+                .id(1L)
+                .name("test")
+                .email("test@test.com")
+                .build();
+        Mockito.when(userService.updateUser(Mockito.eq(id), Mockito.any(UserDto.class)))
+                .thenReturn(userDto);
+
+        mockMvc.perform(MockMvcRequestBuilders.patch("/users/" + id)
+                        .content(asJsonString(userDto))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1L))
+                .andExpect(jsonPath("$.name").value(userDto.getName()))
+                .andExpect(jsonPath("$.email").value(userDto.getEmail()));
+    }
 
     @Test
     void updateUser_invalidId() throws Exception {
