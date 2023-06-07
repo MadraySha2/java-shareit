@@ -46,6 +46,8 @@ class BookingServiceImplTest {
 
     Item item1 = new Item();
 
+    Item item2 = new Item();
+
     Booking booking = new Booking();
 
     Booking booking1 = new Booking();
@@ -64,6 +66,8 @@ class BookingServiceImplTest {
         user1 = toUser(userService.addUser(toUserDto(user1)));
         item1 = Item.builder().id(2L).owner(user1).description("Test1").name("Test1").available(true).build();
         item1 = toItem(itemService.addItem(2L, toItemDto(item1)));
+        item2 = Item.builder().id(3L).owner(user).description("Test2").name("Test2").available(false).build();
+        item2 = toItem(itemService.addItem(1L, toItemDto(item2)));
         booking = bookingRepository.save(Booking.builder().item(item).booker(user1).start(LocalDateTime.now().minusHours(1)).end(LocalDateTime.now().plusHours(1)).status(Status.WAITING).build());
         booking1 = bookingRepository.save(Booking.builder().item(item).booker(user1).start(LocalDateTime.now().minusHours(2)).end(LocalDateTime.now().minusHours(1)).status(Status.WAITING).build());
         booking2 = bookingRepository.save(Booking.builder().item(item).booker(user1).start(LocalDateTime.now().plusHours(1)).end(LocalDateTime.now().plusHours(2)).status(Status.WAITING).build());
@@ -113,17 +117,58 @@ class BookingServiceImplTest {
     }
 
     @Test
+    void addBooking_OwnItem() {
+        BookingEntryDto bookingEntryDto = BookingEntryDto.builder()
+                .itemId(1L)
+                .start(LocalDateTime.now().plusHours(1))
+                .end(LocalDateTime.now().plusHours(2))
+                .build();
+
+        assertThrows(NotFoundException.class, () ->
+                bookingService.addBooking(user.getId(), bookingEntryDto));
+    }
+
+    @Test
+    void addBooking_Unavailable() {
+        BookingEntryDto bookingEntryDto = BookingEntryDto.builder()
+                .itemId(3L)
+                .start(LocalDateTime.now().minusHours(1))
+                .end(LocalDateTime.now().minusHours(2))
+                .build();
+
+        assertThrows(NotAvailableException.class, () ->
+                bookingService.addBooking(user.getId(), bookingEntryDto));
+    }
+
+    @Test
+    void addBooking_InvalidDate() {
+        BookingEntryDto bookingEntryDto = BookingEntryDto.builder()
+                .itemId(1L)
+                .start(LocalDateTime.now().minusHours(1))
+                .end(LocalDateTime.now().minusHours(2))
+                .build();
+
+        assertThrows(NotAvailableException.class, () ->
+                bookingService.addBooking(user.getId(), bookingEntryDto));
+    }
+
+    @Test
     void approveBooking() {
         bookingService.approveBooking(1L, 1L, true);
         bookingService.approveBooking(1L, 3L, false);
         List<BookingDto> testBookings = bookingService.getAllBookingByState(2L, "WAITING", pageRequest);
         assertEquals(1, testBookings.size());
-        List<BookingDto> testBookingStatusRejected = bookingService.getAllBookingByState(2L, "REJECTED", pageRequest);
-        assertEquals(1, testBookingStatusRejected.size());
-        assertEquals(3L, testBookingStatusRejected.get(0).getId());
         List<BookingDto> testBookingStatusCurrent = bookingService.getAllBookingByState(2L, "CURRENT", pageRequest);
         assertEquals(1, testBookingStatusCurrent.size());
         assertEquals(1L, testBookingStatusCurrent.get(0).getId());
+    }
+
+    @Test
+    void disApproveBooking() {
+        bookingService.approveBooking(1L, 3L, false);
+        List<BookingDto> testBookingStatusRejected = bookingService.getAllBookingByState(2L, "REJECTED", pageRequest);
+        assertEquals(1, testBookingStatusRejected.size());
+        assertEquals(3L, testBookingStatusRejected.get(0).getId());
     }
 
     @Test
