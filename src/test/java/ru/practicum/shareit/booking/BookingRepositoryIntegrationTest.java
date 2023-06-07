@@ -7,10 +7,12 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import ru.practicum.shareit.item.Item;
 import ru.practicum.shareit.user.User;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -144,18 +146,14 @@ public class BookingRepositoryIntegrationTest {
         User user1 = User.builder().name("TestUser1").email("test1@mail.com").build();
         entityManager.persist(user1);
         Status status = Status.APPROVED;
-        Booking booking1 = Booking.builder()
-                .booker(user).item(item1).status(Status.APPROVED).build();
-        Booking booking2 = Booking.builder()
-                .booker(user).item(item1).status(Status.APPROVED).build();
-        Booking booking3 = Booking.builder()
-                .booker(user1).status(Status.APPROVED).build();
+        Booking booking1 = Booking.builder().booker(user).item(item1).status(Status.APPROVED).build();
+        Booking booking2 = Booking.builder().booker(user).item(item1).status(Status.APPROVED).build();
+        Booking booking3 = Booking.builder().booker(user1).status(Status.APPROVED).build();
         entityManager.persist(booking1);
         entityManager.persist(booking2);
         entityManager.persist(booking3);
         Pageable pageable = PageRequest.of(0, 10);
-        Page<Booking> resultPage = bookingRepository
-                .findAllByItemOwnerIdAndStatus(item1.getOwner().getId(), status, pageable);
+        Page<Booking> resultPage = bookingRepository.findAllByItemOwnerIdAndStatus(item1.getOwner().getId(), status, pageable);
 
         assertThat(resultPage).isNotEmpty();
         assertThat(resultPage.getContent()).hasSize(2);
@@ -170,18 +168,14 @@ public class BookingRepositoryIntegrationTest {
         entityManager.persist(item1);
         User user1 = User.builder().name("TestUser1").email("test1@mail.com").build();
         entityManager.persist(user1);
-        Booking booking1 = Booking.builder().booker(user)
-                .item(item1).start(LocalDateTime.now().minusHours(2)).end(LocalDateTime.now().minusHours(1)).build();
-        Booking booking2 = Booking.builder().booker(user)
-                .item(item1).start(LocalDateTime.now().minusHours(2)).end(LocalDateTime.now().minusHours(1)).build();
-        Booking booking3 = Booking.builder().booker(user1)
-                .start(LocalDateTime.now().minusHours(2)).end(LocalDateTime.now().plusHours(1)).build();
+        Booking booking1 = Booking.builder().booker(user).item(item1).start(LocalDateTime.now().minusHours(2)).end(LocalDateTime.now().minusHours(1)).build();
+        Booking booking2 = Booking.builder().booker(user).item(item1).start(LocalDateTime.now().minusHours(2)).end(LocalDateTime.now().minusHours(1)).build();
+        Booking booking3 = Booking.builder().booker(user1).start(LocalDateTime.now().minusHours(2)).end(LocalDateTime.now().plusHours(1)).build();
         entityManager.persist(booking1);
         entityManager.persist(booking2);
         entityManager.persist(booking3);
         Pageable pageable = PageRequest.of(0, 10);
-        Page<Booking> resultPage = bookingRepository
-                .findAllByItemOwnerIdAndEndBefore(user.getId(), LocalDateTime.now(), pageable);
+        Page<Booking> resultPage = bookingRepository.findAllByItemOwnerIdAndEndBefore(user.getId(), LocalDateTime.now(), pageable);
 
         assertThat(resultPage).isNotEmpty();
         assertThat(resultPage.getContent()).hasSize(2);
@@ -196,18 +190,14 @@ public class BookingRepositoryIntegrationTest {
         entityManager.persist(item1);
         User user1 = User.builder().name("TestUser1").email("test1@mail.com").build();
         entityManager.persist(user1);
-        Booking booking1 = Booking.builder().booker(user).item(item1).start(LocalDateTime.now()
-                .plusHours(2)).end(LocalDateTime.now().plusHours(1)).build();
-        Booking booking2 = Booking.builder().booker(user).item(item1).start(LocalDateTime.now()
-                .plusHours(2)).end(LocalDateTime.now().plusHours(1)).build();
-        Booking booking3 = Booking.builder().booker(user1).start(LocalDateTime.now()
-                .minusHours(2)).end(LocalDateTime.now().plusHours(1)).build();
+        Booking booking1 = Booking.builder().booker(user).item(item1).start(LocalDateTime.now().plusHours(2)).end(LocalDateTime.now().plusHours(1)).build();
+        Booking booking2 = Booking.builder().booker(user).item(item1).start(LocalDateTime.now().plusHours(2)).end(LocalDateTime.now().plusHours(1)).build();
+        Booking booking3 = Booking.builder().booker(user1).start(LocalDateTime.now().minusHours(2)).end(LocalDateTime.now().plusHours(1)).build();
         entityManager.persist(booking1);
         entityManager.persist(booking2);
         entityManager.persist(booking3);
         Pageable pageable = PageRequest.of(0, 10);
-        Page<Booking> resultPage = bookingRepository
-                .findAllByItemOwnerIdAndStartAfter(user.getId(), LocalDateTime.now(), pageable);
+        Page<Booking> resultPage = bookingRepository.findAllByItemOwnerIdAndStartAfter(user.getId(), LocalDateTime.now(), pageable);
 
         assertThat(resultPage).isNotEmpty();
         assertThat(resultPage.getContent()).hasSize(2);
@@ -222,22 +212,40 @@ public class BookingRepositoryIntegrationTest {
         entityManager.persist(item1);
         User user1 = User.builder().name("TestUser1").email("test1@mail.com").build();
         entityManager.persist(user1);
-        Booking booking1 = Booking.builder().booker(user).start(LocalDateTime.now()
-                .plusHours(2)).end(LocalDateTime.now().plusHours(1)).build();
-        Booking booking2 = Booking.builder().booker(user).start(LocalDateTime.now()
-                .plusHours(2)).end(LocalDateTime.now().plusHours(1)).build();
-        Booking booking3 = Booking.builder().booker(user).item(item1).start(LocalDateTime.now()
-                .minusHours(2)).end(LocalDateTime.now().plusHours(1)).build();
+        Booking booking1 = Booking.builder().booker(user).start(LocalDateTime.now().plusHours(2)).end(LocalDateTime.now().plusHours(1)).build();
+        Booking booking2 = Booking.builder().booker(user).start(LocalDateTime.now().plusHours(2)).end(LocalDateTime.now().plusHours(1)).build();
+        Booking booking3 = Booking.builder().booker(user).item(item1).start(LocalDateTime.now().minusHours(2)).end(LocalDateTime.now().plusHours(1)).build();
         entityManager.persist(booking1);
         entityManager.persist(booking2);
         entityManager.persist(booking3);
         Pageable pageable = PageRequest.of(0, 10);
-        Page<Booking> resultPage = bookingRepository
-                .findAllByItemOwnerIdAndStartBeforeAndEndAfter(user.getId(), LocalDateTime.now(), LocalDateTime.now(), pageable);
+        Page<Booking> resultPage = bookingRepository.findAllByItemOwnerIdAndStartBeforeAndEndAfter(user.getId(), LocalDateTime.now(), LocalDateTime.now(), pageable);
 
         assertThat(resultPage).isNotEmpty();
         assertThat(resultPage.getContent()).hasSize(1);
         assertThat(resultPage.getContent()).contains(booking3);
     }
 
+    @Test
+    void findByItemId() {
+        User user = User.builder().name("TestUser").email("test@mail.com").build();
+        entityManager.persist(user);
+        Item item1 = Item.builder().owner(user).build();
+        entityManager.persist(item1);
+        Booking booking1 = Booking.builder().booker(user).item(item1).start(LocalDateTime.now().plusHours(2)).end(LocalDateTime.now().plusHours(1)).build();
+        entityManager.persist(booking1);
+        List<Booking> bookings = bookingRepository.findByItemId(item1.getId(), Sort.by(Sort.Direction.ASC, "start"));
+        assertThat(bookings).hasSize(1);
+        assertThat(bookings).contains(booking1);
+    }
+
+    @Test
+    void existsByBookerIdAndEndBeforeAndStatus() {
+        User user = User.builder().name("TestUser").email("test@mail.com").build();
+        entityManager.persist(user);
+        Booking booking1 = Booking.builder().booker(user).end(LocalDateTime.now().minusHours(1)).status(Status.WAITING).build();
+        entityManager.persist(booking1);
+        Boolean exist = bookingRepository.existsByBookerIdAndEndBeforeAndStatus(user.getId(), LocalDateTime.now(), Status.WAITING);
+        assertThat(exist).isTrue();
+    }
 }

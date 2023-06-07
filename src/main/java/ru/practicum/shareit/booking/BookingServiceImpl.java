@@ -152,7 +152,7 @@ public class BookingServiceImpl implements BookingService {
         return bookingList.stream().map(BookingMapper::toBookingDto).collect(Collectors.toList());
     }
 
-    public static State convert(String state) {
+    private static State convert(String state) {
         try {
             return State.valueOf(state);
         } catch (Exception e) {
