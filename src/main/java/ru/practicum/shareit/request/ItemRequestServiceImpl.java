@@ -3,6 +3,8 @@ package ru.practicum.shareit.request;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import ru.practicum.shareit.exceptions.NotFoundException;
 import ru.practicum.shareit.item.ItemForRequest;
@@ -10,6 +12,7 @@ import ru.practicum.shareit.item.ItemMapper;
 import ru.practicum.shareit.item.ItemRepository;
 import ru.practicum.shareit.user.UserRepository;
 
+import javax.xml.bind.ValidationException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -39,21 +42,29 @@ public class ItemRequestServiceImpl implements ItemRequestsService {
 
 
     @Override
-    public List<ItemRequestWithItems> getOwnRequests(Long id, PageRequest pageRequest) {
+    public List<ItemRequestWithItems> getOwnRequests(Long id, int from, int size) throws ValidationException {
         if (!userRepository.existsById(id)) {
             throw new NotFoundException("User Not found!");
         }
+        if (from < 0 || size < 0) {
+            throw new ValidationException("");
+        }
+        Pageable pageable = PageRequest.of(from, size).withSort(Sort.by("created").descending());
         Page<ItemRequestWithItems> requests = itemRequestsRepository
-                .findByRequestor_id(id, pageRequest).map(this::setItems);
+                .findByRequestor_id(id, pageable).map(this::setItems);
         return requests.stream().collect(Collectors.toList());
     }
 
     @Override
-    public List<ItemRequestWithItems> getAll(Long id, PageRequest pageRequest) {
+    public List<ItemRequestWithItems> getAll(Long id, int from, int size) throws ValidationException {
         if (!userRepository.existsById(id)) {
             throw new NotFoundException("User Not found!");
         }
-        return itemRequestsRepository.findAllByRequestorIdNot(id, pageRequest)
+        if (from < 0 || size < 0) {
+            throw new ValidationException("");
+        }
+        Pageable pageable = PageRequest.of(from, size).withSort(Sort.by("created").descending());
+        return itemRequestsRepository.findAllByRequestorIdNot(id, pageable)
                 .map(this::setItems).stream().collect(Collectors.toList());
     }
 

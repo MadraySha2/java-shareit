@@ -6,8 +6,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.test.annotation.DirtiesContext;
 import ru.practicum.shareit.booking.Booking;
 import ru.practicum.shareit.booking.BookingDto;
@@ -73,8 +71,6 @@ class ItemServiceImplTest {
     ItemRequest itemRequest = new ItemRequest();
     private final Timestamp now = Timestamp.valueOf(LocalDateTime.now());
 
-    PageRequest pageRequest = PageRequest.of(0, 10).withSort(Sort.by("created").descending());
-
     @BeforeEach
     public void beforeEach() throws DuplicateException, ValidationException {
         user = User.builder().id(1L).name("test").email("test@test.ru").build();
@@ -110,19 +106,19 @@ class ItemServiceImplTest {
 
     @Test
     void getItems() {
-        List<ItemDto> itemsTest = itemService.getItems(1L, pageRequest);
+        List<ItemDto> itemsTest = itemService.getItems(1L);
         assertNotNull(itemsTest);
         assertEquals(1, itemsTest.size());
         assertEquals("Test", itemsTest.get(0).getDescription());
         assertEquals("Test", itemsTest.get(0).getName());
         assertEquals(1L, itemsTest.get(0).getOwner().getId());
-        List<ItemDto> items2Test = itemService.getItems(2L, pageRequest);
+        List<ItemDto> items2Test = itemService.getItems(2L);
         assertNotNull(items2Test);
         assertEquals(1, items2Test.size());
         assertEquals("Test1", items2Test.get(0).getDescription());
         assertEquals("Test1", items2Test.get(0).getName());
         assertEquals(2L, items2Test.get(0).getOwner().getId());
-        List<ItemDto> items3Test = itemService.getItems(3L, pageRequest);
+        List<ItemDto> items3Test = itemService.getItems(3L);
         assertNotNull(items3Test);
         assertEquals(1, items3Test.size());
         assertEquals("Test2", items3Test.get(0).getDescription());
@@ -186,7 +182,7 @@ class ItemServiceImplTest {
     }
 
     @Test
-    void searchItem() {
+    void searchItem() throws ValidationException {
         ItemDto item11 = itemService.addItem(1L, ItemDto.builder().name("Дрель").description("Дрель эллектрическая").owner(user)
                 .available(true).build());
         ItemDto item22 = itemService.addItem(1L, ItemDto.builder().name("Дрель ручная").description("Дрель ручная").owner(user)
@@ -195,38 +191,38 @@ class ItemServiceImplTest {
                 .available(true).build());
         ItemDto item44 = itemService.addItem(1L, ItemDto.builder().name("Отвертка").description("Отвертка ручная").owner(user)
                 .available(false).build());
-        Collection<ItemDto> items = itemService.searchItems("Дрель", PageRequest.of(0, 10));
+        Collection<ItemDto> items = itemService.searchItems("Дрель", 0, 10);
         assertThat(items).hasSize(2);
         assertThat(items).contains(item11, item22);
-        Collection<ItemDto> items1 = itemService.searchItems("Эллектрическая", PageRequest.of(0, 10));
+        Collection<ItemDto> items1 = itemService.searchItems("Эллектрическая", 0, 10);
         assertThat(items1).hasSize(2);
         assertThat(items1).contains(item11, item33);
-        Collection<ItemDto> items2 = itemService.searchItems("ручная", PageRequest.of(0, 10));
+        Collection<ItemDto> items2 = itemService.searchItems("ручная", 0, 10);
         assertThat(items2).hasSize(1);
         assertThat(items2).contains(item22);
     }
 
     @Test
-    void searchItemBlank() {
+    void searchItemBlank() throws ValidationException {
         ItemDto item11 = itemService.addItem(1L, ItemDto.builder().name("Дрель").description("Дрель эллектрическая").owner(user)
                 .available(true).build());
         ItemDto item22 = itemService.addItem(1L, ItemDto.builder().name("Дрель ручная").description("Дрель ручная").owner(user)
                 .available(true).build());
         ItemDto item33 = itemService.addItem(1L, ItemDto.builder().name("Отвертка").description("Отвертка эллектрическая").owner(user)
                 .available(true).build());
-        Collection<ItemDto> items = itemService.searchItems(" ", PageRequest.of(0, 10));
+        Collection<ItemDto> items = itemService.searchItems(" ", 0, 10);
         assertThat(items).hasSize(0);
     }
 
     @Test
-    void searchItem_NoSuchItem() {
+    void searchItem_NoSuchItem() throws ValidationException {
         ItemDto item11 = itemService.addItem(1L, ItemDto.builder().name("Дрель").description("Дрель эллектрическая").owner(user)
                 .available(true).build());
         ItemDto item22 = itemService.addItem(1L, ItemDto.builder().name("Дрель ручная").description("Дрель ручная").owner(user)
                 .available(true).build());
         ItemDto item33 = itemService.addItem(1L, ItemDto.builder().name("Отвертка").description("Отвертка эллектрическая").owner(user)
                 .available(true).build());
-        Collection<ItemDto> items = itemService.searchItems("Cтул", PageRequest.of(0, 10));
+        Collection<ItemDto> items = itemService.searchItems("Cтул", 0, 10);
         assertThat(items).hasSize(0);
     }
 
@@ -236,12 +232,12 @@ class ItemServiceImplTest {
                 .name("Updated").description("Updated").available(true).build();
         assertThrows(NotFoundException.class, () -> itemService.addItem(99L, testItem));
         itemService.addItem(1L, testItem);
-        List<ItemDto> afterItems = itemService.getItems(1L, pageRequest);
+        List<ItemDto> afterItems = itemService.getItems(1L);
         assertEquals(2, afterItems.size());
         assertEquals("Updated", afterItems.get(1).getName());
         assertEquals("Updated", afterItems.get(1).getDescription());
         assertEquals(1L, afterItems.get(1).getOwner().getId());
-        List<ItemDto> items2Dto = itemService.getItems(2L, pageRequest);
+        List<ItemDto> items2Dto = itemService.getItems(2L);
         assertEquals(1, items2Dto.size());
     }
 
@@ -261,7 +257,7 @@ class ItemServiceImplTest {
 
     @Test
     void addComment() {
-        ItemDto itemDto = itemService.getItems(2L, pageRequest).get(0);
+        ItemDto itemDto = itemService.getItems(2L).get(0);
         assertEquals(1, itemDto.getComments().size());
     }
 

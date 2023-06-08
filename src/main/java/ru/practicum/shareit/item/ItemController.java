@@ -2,12 +2,11 @@ package ru.practicum.shareit.item;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.properties.bind.DefaultValue;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.comment.CommentDto;
 
 import javax.validation.Valid;
-import javax.validation.constraints.Min;
+import javax.xml.bind.ValidationException;
 import java.util.List;
 
 @RestController
@@ -19,10 +18,8 @@ public class ItemController {
     private final ItemService itemService;
 
     @GetMapping
-    public List<ItemDto> getItems(@RequestHeader("X-Sharer-User-Id") Long id,
-                                  @RequestParam(defaultValue = "0") @Min(0) int from,
-                                  @RequestParam(defaultValue = "10") @Min(1) int size) {
-        return itemService.getItems(id, PageRequest.of(from, size));
+    public List<ItemDto> getItems(@RequestHeader("X-Sharer-User-Id") Long id) {
+        return itemService.getItems(id);
     }
 
     @GetMapping("/{itemId}")
@@ -32,10 +29,9 @@ public class ItemController {
 
     @GetMapping("/search")
     public List<ItemDto> searchItems(@RequestParam @DefaultValue(value = " ") String text,
-                                     @RequestParam(defaultValue = "0") @Min(0) int from,
-                                     @RequestParam(defaultValue = "10") @Min(1) int size) {
-        return itemService.searchItems(text, PageRequest
-                .of(from, size));
+                                     @RequestParam(defaultValue = "0") int from,
+                                     @RequestParam(defaultValue = "10") int size) throws ValidationException {
+        return itemService.searchItems(text, from, size);
     }
 
     @PatchMapping("/{itemId}")

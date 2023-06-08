@@ -6,14 +6,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.test.annotation.DirtiesContext;
 import ru.practicum.shareit.exceptions.NotFoundException;
 import ru.practicum.shareit.item.Item;
 import ru.practicum.shareit.user.User;
 import ru.practicum.shareit.user.UserServiceImpl;
 
+import javax.xml.bind.ValidationException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -41,9 +40,8 @@ class ItemRequestServiceImplTest {
     private ItemRequest itemRequest = new ItemRequest();
     private ItemRequest itemRequest1 = new ItemRequest();
 
-    private Item item = new Item();
+    private final Item item = new Item();
 
-    PageRequest pageRequest = PageRequest.of(0, 10).withSort(Sort.by("created").descending());
     private final Timestamp now = Timestamp.valueOf(LocalDateTime.now());
 
     @BeforeEach
@@ -78,11 +76,11 @@ class ItemRequestServiceImplTest {
     }
 
     @Test
-    void getOwnRequests() {
+    void getOwnRequests() throws ValidationException {
         ItemRequestDto testItem = itemRequestService.addRequest(1L, toRequestDto(itemRequest));
         ItemRequestDto testItem2 = itemRequestService.addRequest(2L, toRequestDto(itemRequest1));
-        List<ItemRequestWithItems> testOwnRequests = itemRequestService.getOwnRequests(1L, pageRequest);
-        List<ItemRequestWithItems> testOwnRequests1 = itemRequestService.getOwnRequests(2L, pageRequest);
+        List<ItemRequestWithItems> testOwnRequests = itemRequestService.getOwnRequests(1L, 0, 10);
+        List<ItemRequestWithItems> testOwnRequests1 = itemRequestService.getOwnRequests(2L, 0, 10);
         assertEquals(1, testOwnRequests.size());
         assertEquals(1, testOwnRequests1.size());
         assertEquals("test", testOwnRequests.get(0).getDescription());
@@ -92,17 +90,17 @@ class ItemRequestServiceImplTest {
     @Test
     void getOwnRequests_invalidUser() {
         assertThrows(NotFoundException.class, () -> {
-            itemRequestService.getOwnRequests(100L, pageRequest);
+            itemRequestService.getOwnRequests(100L, 0, 10);
         });
     }
 
     @Test
-    void getAll() {
+    void getAll() throws ValidationException {
         ItemRequestDto testItem = itemRequestService.addRequest(1L, toRequestDto(itemRequest));
         ItemRequestDto testItem2 = itemRequestService.addRequest(2L, toRequestDto(itemRequest1));
-        List<ItemRequestWithItems> testOwnRequests = itemRequestService.getAll(1L, pageRequest);
-        List<ItemRequestWithItems> testOwnRequests1 = itemRequestService.getAll(2L, pageRequest);
-        List<ItemRequestWithItems> testOwnRequests2 = itemRequestService.getAll(3L, pageRequest);
+        List<ItemRequestWithItems> testOwnRequests = itemRequestService.getAll(1L, 0, 10);
+        List<ItemRequestWithItems> testOwnRequests1 = itemRequestService.getAll(2L, 0, 10);
+        List<ItemRequestWithItems> testOwnRequests2 = itemRequestService.getAll(3L, 0, 10);
         assertEquals(1, testOwnRequests.size());
         assertEquals(1, testOwnRequests1.size());
         assertEquals(2, testOwnRequests2.size());
@@ -116,7 +114,7 @@ class ItemRequestServiceImplTest {
     @Test
     void getAll_invalidUser() {
         assertThrows(NotFoundException.class, () -> {
-            itemRequestService.getAll(100L, pageRequest);
+            itemRequestService.getAll(100L, 0, 10);
         });
     }
 

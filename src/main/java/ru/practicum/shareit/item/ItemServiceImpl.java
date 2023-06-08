@@ -2,6 +2,7 @@ package ru.practicum.shareit.item;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,7 @@ import ru.practicum.shareit.user.UserRepository;
 import ru.practicum.shareit.user.UserService;
 
 import javax.transaction.Transactional;
+import javax.xml.bind.ValidationException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -50,7 +52,7 @@ public class ItemServiceImpl implements ItemService {
     private final UserRepository userRepository;
 
 
-    public List<ItemDto> getItems(Long id, Pageable pageable) {
+    public List<ItemDto> getItems(Long id) {
         if (!userRepository.existsById(id)) {
             throw new NotFoundException("User Not found");
         }
@@ -70,10 +72,14 @@ public class ItemServiceImpl implements ItemService {
         return item;
     }
 
-    public List<ItemDto> searchItems(String text, Pageable pageable) {
+    public List<ItemDto> searchItems(String text, int from, int size) throws ValidationException {
         if (text.isBlank()) {
             return new ArrayList<>();
         }
+        if (from < 0 || size < 0) {
+            throw new ValidationException("Not valid page");
+        }
+        Pageable pageable = PageRequest.of(from, size);
         return itemRepository.findByNameOrDescriptionAvailable(text, pageable).stream().map(ItemMapper::toItemDto).collect(Collectors.toList());
     }
 

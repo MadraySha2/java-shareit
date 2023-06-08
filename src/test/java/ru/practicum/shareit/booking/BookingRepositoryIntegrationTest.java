@@ -27,7 +27,7 @@ public class BookingRepositoryIntegrationTest {
 
     @Test
     public void testFindAllByBookerId() {
-        User user = User.builder().name("TestUser").email("test@mail.com").build();
+        User user = makeUser();
         entityManager.persist(user);
         Item item1 = Item.builder().owner(user).build();
         entityManager.persist(item1);
@@ -50,7 +50,7 @@ public class BookingRepositoryIntegrationTest {
 
     @Test
     public void testFindAllByBookerIdAndStatus() {
-        User user = User.builder().name("TestUser").email("test@mail.com").build();
+        User user = makeUser();
         entityManager.persist(user);
         Item item1 = Item.builder().owner(user).build();
         entityManager.persist(item1);
@@ -73,7 +73,7 @@ public class BookingRepositoryIntegrationTest {
 
     @Test
     public void testFindAllByBookerIdAndEndBefore() {
-        User user = User.builder().name("TestUser").email("test@mail.com").build();
+        User user = makeUser();
         entityManager.persist(user);
         Item item1 = Item.builder().owner(user).build();
         entityManager.persist(item1);
@@ -95,7 +95,7 @@ public class BookingRepositoryIntegrationTest {
 
     @Test
     public void testFindAllByBookerIdAndStartAfter() {
-        User user = User.builder().name("TestUser").email("test@mail.com").build();
+        User user = makeUser();
         entityManager.persist(user);
         Item item1 = Item.builder().owner(user).build();
         entityManager.persist(item1);
@@ -117,7 +117,7 @@ public class BookingRepositoryIntegrationTest {
 
     @Test
     public void testFindAllByBookerIdAndStartBeforeAndEndAfter() {
-        User user = User.builder().name("TestUser").email("test@mail.com").build();
+        User user = makeUser();
         entityManager.persist(user);
         Item item1 = Item.builder().owner(user).build();
         entityManager.persist(item1);
@@ -139,7 +139,7 @@ public class BookingRepositoryIntegrationTest {
 
     @Test
     public void testFindAllByItemOwnerIdAndStatus() {
-        User user = User.builder().name("TestUser").email("test@mail.com").build();
+        User user = makeUser();
         entityManager.persist(user);
         Item item1 = Item.builder().owner(user).build();
         entityManager.persist(item1);
@@ -162,7 +162,7 @@ public class BookingRepositoryIntegrationTest {
 
     @Test
     public void testFindAllByItemOwnerIdAndEndBefore() {
-        User user = User.builder().name("TestUser").email("test@mail.com").build();
+        User user = makeUser();
         entityManager.persist(user);
         Item item1 = Item.builder().owner(user).build();
         entityManager.persist(item1);
@@ -184,7 +184,7 @@ public class BookingRepositoryIntegrationTest {
 
     @Test
     public void testFindAllByItemOwnerIdAndStartAfter() {
-        User user = User.builder().name("TestUser").email("test@mail.com").build();
+        User user = makeUser();
         entityManager.persist(user);
         Item item1 = Item.builder().owner(user).build();
         entityManager.persist(item1);
@@ -206,7 +206,7 @@ public class BookingRepositoryIntegrationTest {
 
     @Test
     public void testFindAllByItemOwnerIdAndStartBeforeAndEndAfter() {
-        User user = User.builder().name("TestUser").email("test@mail.com").build();
+        User user = makeUser();
         entityManager.persist(user);
         Item item1 = Item.builder().owner(user).build();
         entityManager.persist(item1);
@@ -228,7 +228,7 @@ public class BookingRepositoryIntegrationTest {
 
     @Test
     void findByItemId() {
-        User user = User.builder().name("TestUser").email("test@mail.com").build();
+        User user = makeUser();
         entityManager.persist(user);
         Item item1 = Item.builder().owner(user).build();
         entityManager.persist(item1);
@@ -241,7 +241,7 @@ public class BookingRepositoryIntegrationTest {
 
     @Test
     void existsByBookerIdAndEndBeforeAndStatus() {
-        User user = User.builder().name("TestUser").email("test@mail.com").build();
+        User user = makeUser();
         entityManager.persist(user);
 
         Booking booking1 = Booking.builder().booker(user).end(LocalDateTime.now().minusHours(1)).status(Status.WAITING).build();
@@ -252,7 +252,7 @@ public class BookingRepositoryIntegrationTest {
 
     @Test
     void findAllByItemOwnerId() {
-        User user = User.builder().name("TestUser").email("test@mail.com").build();
+        User user = makeUser();
         entityManager.persist(user);
         Item item1 = Item.builder().owner(user).build();
         entityManager.persist(item1);
@@ -268,5 +268,7 @@ public class BookingRepositoryIntegrationTest {
         assertThat(bookings.get(0).getItem().getId()).isNotEqualTo(item2.getId().longValue());
     }
 
-    ;
+    private User makeUser() {
+        return User.builder().name("TestUser").email("test@mail.com").build();
+    }
 }

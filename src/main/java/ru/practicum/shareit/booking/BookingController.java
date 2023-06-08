@@ -1,8 +1,6 @@
 package ru.practicum.shareit.booking;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -39,14 +37,10 @@ public class BookingController {
     @GetMapping()
     public List<BookingDto> getAllBookingByState(@RequestHeader("X-Sharer-User-Id") Long id,
                                                  @RequestParam(defaultValue = "ALL") String state,
-                                                 @RequestParam(defaultValue = "0") @PositiveOrZero int from,
-                                                 @RequestParam(defaultValue = "10") @PositiveOrZero int size) throws ValidationException {
+                                                 @RequestParam(defaultValue = "0") int from,
+                                                 @RequestParam(defaultValue = "10") int size) throws ValidationException {
 
-        if (from < 0 || size < 0) {
-            throw new ValidationException("");
-        }
-        return bookingService.getAllBookingByState(id, state,
-                PageRequest.of(from > 0 ? from / size : 0, size, Sort.by(Sort.Direction.DESC, "start")));
+        return bookingService.getAllBookingByState(id, state, from, size);
     }
 
     @Validated
@@ -55,11 +49,7 @@ public class BookingController {
                                                 @RequestParam(defaultValue = "ALL") String state,
                                                 @RequestParam(defaultValue = "0") @PositiveOrZero int from,
                                                 @RequestParam(defaultValue = "10") @PositiveOrZero int size) throws ValidationException {
-        if (from < 0 || size < 0) {
-            throw new ValidationException("");
-        }
-        return bookingService.getAllOwnersBookingByState(id, state,
-                PageRequest.of(from > 0 ? from / size : 0, size, Sort.by(Sort.Direction.DESC, "start")));
+        return bookingService.getAllOwnersBookingByState(id, state, from, size);
     }
 
 }

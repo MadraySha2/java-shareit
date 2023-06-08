@@ -8,12 +8,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.practicum.shareit.exceptions.NotFoundException;
 import ru.practicum.shareit.item.comment.CommentDto;
 
+import javax.xml.bind.ValidationException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,7 +41,7 @@ public class ItemControllerTests {
         int size = 10;
         List<ItemDto> expectedResult = new ArrayList<>();
 
-        when(itemService.getItems(userId, PageRequest.of(from, size))).thenReturn(expectedResult);
+        when(itemService.getItems(userId)).thenReturn(expectedResult);
         mockMvc.perform(get("/items")
                         .header("X-Sharer-User-Id", userId)
                         .param("from", String.valueOf(from))
@@ -51,39 +51,13 @@ public class ItemControllerTests {
     }
 
     @Test
-    public void testGetItems_InvalidFrom() throws Exception {
-        Long userId = 1L;
-        int from = -1;
-        int size = 10;
-        List<ItemDto> expectedResult = new ArrayList<>();
-        mockMvc.perform(get("/items")
-                        .header("X-Sharer-User-Id", userId)
-                        .param("from", String.valueOf(from))
-                        .param("size", String.valueOf(size)))
-                .andExpect(status().isInternalServerError());
-    }
-
-    @Test
-    public void testGetItems_InvalidSize() throws Exception {
-        Long userId = 1L;
-        int from = 0;
-        int size = -1;
-        List<ItemDto> expectedResult = new ArrayList<>();
-        mockMvc.perform(get("/items")
-                        .header("X-Sharer-User-Id", userId)
-                        .param("from", String.valueOf(from))
-                        .param("size", String.valueOf(size)))
-                .andExpect(status().isInternalServerError());
-    }
-
-    @Test
     public void testSearchItems() throws Exception {
         String text = "search";
         int from = 0;
         int size = 10;
         List<ItemDto> expectedResult = new ArrayList<>();
 
-        when(itemService.searchItems(text, PageRequest.of(from, size))).thenReturn(expectedResult);
+        when(itemService.searchItems(text, from, size)).thenReturn(expectedResult);
         mockMvc.perform(get("/items/search")
                         .param("text", text)
                         .param("from", String.valueOf(from))
@@ -98,6 +72,7 @@ public class ItemControllerTests {
         int from = -1;
         int size = 10;
         List<ItemDto> expectedResult = new ArrayList<>();
+        when(itemService.searchItems(text, from, size)).thenThrow(new ValidationException(""));
         mockMvc.perform(get("/items/search")
                         .param("text", text)
                         .param("from", String.valueOf(from))
@@ -111,6 +86,7 @@ public class ItemControllerTests {
         int from = 0;
         int size = -1;
         List<ItemDto> expectedResult = new ArrayList<>();
+        when(itemService.searchItems(text, from, size)).thenThrow(new ValidationException(""));
         mockMvc.perform(get("/items/search")
                         .param("text", text)
                         .param("from", String.valueOf(from))

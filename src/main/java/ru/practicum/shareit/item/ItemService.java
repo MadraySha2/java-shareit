@@ -1,17 +1,17 @@
 package ru.practicum.shareit.item;
 
-import org.springframework.data.domain.Pageable;
 import ru.practicum.shareit.item.comment.CommentDto;
 
+import javax.xml.bind.ValidationException;
 import java.util.List;
 
 public interface ItemService {
 
-    List<ItemDto> getItems(Long id, Pageable pageable);
+    List<ItemDto> getItems(Long id);
 
     ItemDto getItemById(Long userId, Long itemId);
 
-    List<ItemDto> searchItems(String text, Pageable pageable);
+    List<ItemDto> searchItems(String text, int from, int size) throws ValidationException;
 
     ItemDto updateItem(Long id, ItemDto itemDto, Long itemId);
 
