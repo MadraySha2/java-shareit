@@ -79,7 +79,7 @@ public class ItemServiceImpl implements ItemService {
         if (from < 0 || size < 0) {
             throw new ValidationException("Not valid page");
         }
-        Pageable pageable = PageRequest.of(from, size);
+        Pageable pageable = PageRequest.of(from > 0 ? from / size : 0, size);
         return itemRepository.findByNameOrDescriptionAvailable(text, pageable).stream().map(ItemMapper::toItemDto).collect(Collectors.toList());
     }
 
