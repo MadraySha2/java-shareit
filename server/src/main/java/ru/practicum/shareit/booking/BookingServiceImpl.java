@@ -105,7 +105,7 @@ public class BookingServiceImpl implements BookingService {
                 bookingList = bookingRepository.findAllByBookerId(id, pageable);
                 break;
             case CURRENT:
-                bookingList = bookingRepository.findAllByBookerIdAndStartBeforeAndEndAfter(id, now, now, pageable);
+                bookingList = bookingRepository.findAllByBookerIdAndStartBeforeAndEndAfterOrderByStart(id, now, now, pageable);
                 break;
             case PAST:
                 bookingList = bookingRepository.findAllByBookerIdAndEndBefore(id, now, pageable);

@@ -130,7 +130,7 @@ public class BookingRepositoryIntegrationTest {
         entityManager.persist(booking2);
         entityManager.persist(booking3);
         Pageable pageable = PageRequest.of(0, 10);
-        Page<Booking> resultPage = bookingRepository.findAllByBookerIdAndStartBeforeAndEndAfter(user.getId(), LocalDateTime.now(), LocalDateTime.now(), pageable);
+        Page<Booking> resultPage = bookingRepository.findAllByBookerIdAndStartBeforeAndEndAfterOrderByStart(user.getId(), LocalDateTime.now(), LocalDateTime.now(), pageable);
 
         assertThat(resultPage).isNotEmpty();
         assertThat(resultPage.getContent()).hasSize(1);
@@ -232,11 +232,11 @@ public class BookingRepositoryIntegrationTest {
         entityManager.persist(user);
         Item item1 = Item.builder().owner(user).build();
         entityManager.persist(item1);
-        Booking booking1 = Booking.builder().booker(user).item(item1).start(LocalDateTime.now().plusHours(2)).end(LocalDateTime.now().plusHours(1)).build();
+        Booking booking1 = Booking.builder().booker(user).item(item1).status(Status.WAITING).start(LocalDateTime.now().plusHours(2)).end(LocalDateTime.now().plusHours(1)).build();
         entityManager.persist(booking1);
         entityManager.flush();
 
-        List<Booking> bookings = bookingRepository.findByItemId(item1.getId(), Sort.by(Sort.Direction.ASC, "start"));
+        List<Booking> bookings = bookingRepository.findByItemIdAndStatus(item1.getId(), Sort.by(Sort.Direction.ASC, "start"), Status.WAITING);
         assertThat(bookings).hasSize(1);
         assertThat(bookings).contains(booking1);
     }

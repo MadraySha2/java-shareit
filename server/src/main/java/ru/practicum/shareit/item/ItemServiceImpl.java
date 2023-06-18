@@ -124,8 +124,8 @@ public class ItemServiceImpl implements ItemService {
 
     private ItemDto setBookings(ItemDto itemDto, Long userId) {
         if (itemDto.getOwner().getId().longValue() == userId.longValue()) {
-            itemDto.setLastBooking(bookingRepository.findByItemId(itemDto.getId(), Sort.by(Sort.Direction.DESC, "start")).stream().filter(booking -> booking.getStart().isBefore(LocalDateTime.now())).map(BookingMapper::toItemBookingDto).max(Comparator.comparing(BookingItemDto::getEnd)).orElse(null));
-            itemDto.setNextBooking(bookingRepository.findByItemId(itemDto.getId(), Sort.by(Sort.Direction.ASC, "start")).stream().filter(booking -> !booking.getStatus().equals(Status.REJECTED)).map(BookingMapper::toItemBookingDto).filter(booking -> booking.getStart().isAfter(LocalDateTime.now())).findFirst().orElse(null));
+            itemDto.setLastBooking(bookingRepository.findByItemIdAndStatus(itemDto.getId(), Sort.by(Sort.Direction.DESC, "start"), Status.APPROVED).stream().filter(booking -> booking.getStart().isBefore(LocalDateTime.now())).map(BookingMapper::toItemBookingDto).max(Comparator.comparing(BookingItemDto::getEnd)).orElse(null));
+            itemDto.setNextBooking(bookingRepository.findByItemIdAndStatus(itemDto.getId(), Sort.by(Sort.Direction.ASC, "start"), Status.APPROVED).stream().filter(booking -> !booking.getStatus().equals(Status.REJECTED)).map(BookingMapper::toItemBookingDto).filter(booking -> booking.getStart().isAfter(LocalDateTime.now())).findFirst().orElse(null));
             return itemDto;
         }
         return itemDto;
