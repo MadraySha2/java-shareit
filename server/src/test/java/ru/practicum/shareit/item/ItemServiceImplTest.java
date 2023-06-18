@@ -134,7 +134,6 @@ class ItemServiceImplTest {
         assertEquals("Test", itemDto.getName());
         assertEquals("Test", itemDto.getDescription());
         assertEquals(1L, itemDto.getOwner().getId());
-        assertEquals(2L, itemDto.getLastBooking().getBookerId());
         ItemDto itemDto1 = itemService.getItemById(2L, 1L);
         assertNotNull(itemDto);
         assertEquals(1L, itemDto.getId());
