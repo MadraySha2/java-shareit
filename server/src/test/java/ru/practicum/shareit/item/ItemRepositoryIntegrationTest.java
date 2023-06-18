@@ -37,7 +37,7 @@ public class ItemRepositoryIntegrationTest {
         Item item3 = Item.builder().owner(user1).build();
         entityManager.persist(item3);
         entityManager.flush();
-        List<Item> items = itemRepository.findAllByOwnerId(user.getId()).stream().collect(Collectors.toList());
+        List<Item> items = itemRepository.findAllByOwnerIdOrderById(user.getId()).stream().collect(Collectors.toList());
 
         assertThat(items).hasSize(2);
         assertThat(items).contains(item1, item2);

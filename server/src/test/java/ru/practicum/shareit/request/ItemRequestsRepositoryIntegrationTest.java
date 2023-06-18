@@ -41,7 +41,7 @@ public class ItemRequestsRepositoryIntegrationTest {
         entityManager.flush();
 
         Pageable pageable = PageRequest.of(0, 10);
-        Page<ItemRequest> resultPage = itemRequestsRepository.findByRequestor_id(user.getId(), pageable);
+        Page<ItemRequest> resultPage = itemRequestsRepository.findByRequestorId(user.getId(), pageable);
 
         assertThat(resultPage).isNotEmpty();
         assertThat(resultPage.getContent()).hasSize(2);

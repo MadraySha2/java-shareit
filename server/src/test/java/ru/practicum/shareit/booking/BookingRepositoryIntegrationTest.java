@@ -234,7 +234,7 @@ public class BookingRepositoryIntegrationTest {
         entityManager.persist(item1);
         Booking booking1 = Booking.builder().booker(user).item(item1).start(LocalDateTime.now().plusHours(2)).end(LocalDateTime.now().plusHours(1)).build();
         entityManager.persist(booking1);
-        List<Booking> bookings = bookingRepository.findByItemId(item1.getId(), Sort.by(Sort.Direction.ASC, "start"));
+        List<Booking> bookings = bookingRepository.findByItemIdAndStatus(item1.getId(), Sort.by(Sort.Direction.ASC, "start"), Status.APPROVED);
         assertThat(bookings).hasSize(1);
         assertThat(bookings).contains(booking1);
     }
