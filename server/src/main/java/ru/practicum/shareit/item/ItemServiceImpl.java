@@ -22,7 +22,6 @@ import ru.practicum.shareit.user.UserRepository;
 import ru.practicum.shareit.user.UserService;
 
 import javax.transaction.Transactional;
-import javax.xml.bind.ValidationException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -56,9 +55,10 @@ public class ItemServiceImpl implements ItemService {
         if (!userRepository.existsById(id)) {
             throw new NotFoundException("User Not found");
         }
-        List<ItemDto> dtoList = itemRepository.findAllByOwnerId(id).stream().map(ItemMapper::toItemDto).collect(Collectors.toList());
+        List<ItemDto> dtoList = itemRepository.findAllByOwnerIdOrderById(id).stream().map(ItemMapper::toItemDto).collect(Collectors.toList());
         dtoList.forEach(itemDto -> itemDto.setComments(getComments(itemDto.getId())));
         dtoList.forEach(itemDto -> setBookings(itemDto, id));
+
         return dtoList;
     }
 
@@ -66,13 +66,14 @@ public class ItemServiceImpl implements ItemService {
         if (!userRepository.existsById(userId)) {
             throw new NotFoundException("User Not found");
         }
-        ItemDto item = toItemDto(itemRepository.findById(itemId).orElseThrow(() -> new NotFoundException("Item not found")));
+        ItemDto item = toItemDto(itemRepository
+                .findById(itemId).orElseThrow(() -> new NotFoundException("Item not found")));
         item = setBookings(item, userId);
         item.setComments(getComments(itemId));
         return item;
     }
 
-    public List<ItemDto> searchItems(String text, int from, int size) throws ValidationException {
+    public List<ItemDto> searchItems(String text, int from, int size) {
         if (text.isBlank()) {
             return new ArrayList<>();
         }
@@ -80,6 +81,7 @@ public class ItemServiceImpl implements ItemService {
         return itemRepository.findByNameOrDescriptionAvailable(text, pageable).stream().map(ItemMapper::toItemDto).collect(Collectors.toList());
     }
 
+    @Transactional
     public ItemDto updateItem(Long id, ItemDto itemDto, Long itemId) {
         Item item = itemRepository.findById(itemId).orElseThrow(() -> new NotFoundException("item not found"));
         if (item.getOwner().getId() != id.longValue()) {
@@ -108,7 +110,6 @@ public class ItemServiceImpl implements ItemService {
         return toItemDto(itemRepository.save(item));
     }
 
-    @Transactional
     public CommentDto addComment(Long userId, Long itemId, CommentDto commentDto) {
         Comment comment = Comment.builder().text(commentDto.getText()).build();
         comment.setAuthor(toUser(userService.getUserById(userId)));
@@ -123,8 +124,8 @@ public class ItemServiceImpl implements ItemService {
 
     private ItemDto setBookings(ItemDto itemDto, Long userId) {
         if (itemDto.getOwner().getId().longValue() == userId.longValue()) {
-            itemDto.setLastBooking(bookingRepository.findByItemId(itemDto.getId(), Sort.by(Sort.Direction.DESC, "start")).stream().filter(booking -> booking.getStart().isBefore(LocalDateTime.now())).map(BookingMapper::toItemBookingDto).max(Comparator.comparing(BookingItemDto::getEnd)).orElse(null));
-            itemDto.setNextBooking(bookingRepository.findByItemId(itemDto.getId(), Sort.by(Sort.Direction.ASC, "start")).stream().filter(booking -> !booking.getStatus().equals(Status.REJECTED)).map(BookingMapper::toItemBookingDto).filter(booking -> booking.getStart().isAfter(LocalDateTime.now())).findFirst().orElse(null));
+            itemDto.setLastBooking(bookingRepository.findByItemIdAndStatus(itemDto.getId(), Sort.by(Sort.Direction.DESC, "start"), Status.APPROVED).stream().filter(booking -> booking.getStart().isBefore(LocalDateTime.now())).map(BookingMapper::toItemBookingDto).max(Comparator.comparing(BookingItemDto::getEnd)).orElse(null));
+            itemDto.setNextBooking(bookingRepository.findByItemIdAndStatus(itemDto.getId(), Sort.by(Sort.Direction.ASC, "start"), Status.APPROVED).stream().filter(booking -> !booking.getStatus().equals(Status.REJECTED)).map(BookingMapper::toItemBookingDto).filter(booking -> booking.getStart().isAfter(LocalDateTime.now())).findFirst().orElse(null));
             return itemDto;
         }
         return itemDto;

@@ -56,7 +56,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public Boolean deleteUser(Long userId) {
         if (userRepository.existsById(userId)) {
-            itemRepository.deleteAll(itemRepository.findAllByOwnerId(userId));
+            itemRepository.deleteAll(itemRepository.findAllByOwnerIdOrderById(userId));
             userRepository.deleteById(userId);
         }
         return !userRepository.existsById(userId);

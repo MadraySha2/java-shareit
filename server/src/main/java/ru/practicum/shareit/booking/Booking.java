@@ -28,10 +28,10 @@ public class Booking {
     private LocalDateTime end;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "itemId")
+    @JoinColumn(name = "item_id")
     private Item item;
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "bookerId")
+    @JoinColumn(name = "booker_id")
     private User booker;
 
     @Enumerated(EnumType.STRING)

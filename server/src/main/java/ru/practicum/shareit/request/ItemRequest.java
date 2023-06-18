@@ -26,7 +26,7 @@ public class ItemRequest {
     private String description;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "requestor_id")
     private User requestor;
 
     private Timestamp created = Timestamp.valueOf(LocalDateTime.now());

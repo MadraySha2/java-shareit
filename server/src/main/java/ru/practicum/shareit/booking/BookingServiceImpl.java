@@ -31,7 +31,7 @@ public class BookingServiceImpl implements BookingService {
     private final UserRepository userRepository;
     private final ItemRepository itemRepository;
 
-    @Transactional
+
     @Override
     public BookingDto addBooking(Long id, BookingEntryDto bookingDto) {
         validateDate(bookingDto);
@@ -57,7 +57,7 @@ public class BookingServiceImpl implements BookingService {
         }
     }
 
-    @Transactional
+
     @Override
     public BookingDto approveBooking(Long id, Long bookingId, Boolean approved) {
         if (!userRepository.existsById(id)) {
@@ -80,7 +80,6 @@ public class BookingServiceImpl implements BookingService {
         return toBookingDto(bookingRepository.save(booking));
     }
 
-    @Transactional
     @Override
     public BookingDto getBookingById(Long id, Long bookingId) {
         if (!userRepository.existsById(id)) {

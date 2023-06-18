@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface ItemRequestsRepository extends JpaRepository<ItemRequest, Long> {
 
 
-    Page<ItemRequest> findByRequestor_id(Long id, Pageable pageable);
+    Page<ItemRequest> findByRequestorId(Long id, Pageable pageable);
 
     Page<ItemRequest> findAllByRequestorIdNot(Long id, Pageable pageable);
 }

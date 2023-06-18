@@ -12,6 +12,7 @@ import ru.practicum.shareit.item.ItemMapper;
 import ru.practicum.shareit.item.ItemRepository;
 import ru.practicum.shareit.user.UserRepository;
 
+import javax.transaction.Transactional;
 import javax.xml.bind.ValidationException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
@@ -31,6 +32,7 @@ public class ItemRequestServiceImpl implements ItemRequestsService {
 
     private final UserRepository userRepository;
 
+    @Transactional
     @Override
     public ItemRequestDto addRequest(Long id, ItemRequestDto itemRequestDto) {
         ItemRequest item = toRequest(itemRequestDto);
@@ -48,7 +50,7 @@ public class ItemRequestServiceImpl implements ItemRequestsService {
         }
         Pageable pageable = PageRequest.of(from > 0 ? from / size : 0, size).withSort(Sort.by("created").descending());
         Page<ItemRequestWithItems> requests = itemRequestsRepository
-                .findByRequestor_id(id, pageable).map(this::setItems);
+                .findByRequestorId(id, pageable).map(this::setItems);
         return requests.stream().collect(Collectors.toList());
     }
 
@@ -62,6 +64,7 @@ public class ItemRequestServiceImpl implements ItemRequestsService {
                 .map(this::setItems).stream().collect(Collectors.toList());
     }
 
+    @Transactional
     @Override
     public ItemRequestWithItems getRequestById(Long id, Long requestId) {
         if (!userRepository.existsById(id)) {
