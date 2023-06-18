@@ -111,7 +111,7 @@ class UserServiceImplTest {
         Optional<User> deletedUser = userRepository.findById(userId);
         assertFalse(deletedUser.isPresent());
 
-        List<Item> items = new ArrayList<>(itemRepository.findAllByOwnerId(userId));
+        List<Item> items = new ArrayList<>(itemRepository.findAllByOwnerIdOrderById(userId));
         assertTrue(items.isEmpty());
     }
 }
